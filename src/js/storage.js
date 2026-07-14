@@ -120,6 +120,34 @@ const upsertOrder = async (key, value) => {
   return true;
 };
 
+/**
+ * Customer-facing order creation goes through the create_order RPC instead
+ * of POSTing to the orders table directly. PostgREST's table insert endpoint
+ * always reads the row back via RETURNING, and that read-back is itself
+ * subject to RLS SELECT policies - which anon has none of on orders (by
+ * design, customers must never read other customers' orders). The RPC does
+ * a plain INSERT with no RETURNING, so it never hits that check, while the
+ * existing orders_insert_customer RLS policy still governs what's allowed.
+ */
+const createOrderViaRpc = async (value) => {
+  const order = typeof value === 'string' ? parseJson(value) : value;
+  if (!order || typeof order !== 'object') {
+    throw new Error('Invalid order payload');
+  }
+
+  const { error } = await supabase.rpc('create_order', {
+    p_id: order.id,
+    p_customer_name: order.name ?? order.customer_name ?? '',
+    p_phone: order.phone ?? '',
+    p_address: order.address ?? '',
+    p_notes: order.notes ?? '',
+    p_items: Array.isArray(order.items) ? order.items : [],
+    p_total: Number(order.total) || 0,
+  });
+  if (error) throw error;
+  return true;
+};
+
 const readOrder = async (key) => {
   const orderId = orderIdFromKey(key);
   const { data, error } = await supabase
@@ -188,6 +216,25 @@ export const storage = {
     }
     const store = persist ? localStorage : sessionStorage;
     store.setItem(key, value);
+    return true;
+  },
+
+  /**
+   * New customer orders must go through this instead of set(), so checkout
+   * uses the create_order RPC rather than a direct table insert (see
+   * createOrderViaRpc for why).
+   */
+  async createOrder(orderData) {
+    if (supabaseEnabled) {
+      return await createOrderViaRpc(orderData);
+    }
+
+    const key = `${ORDER_PREFIX}${orderData.id}`;
+    const value = JSON.stringify(orderData);
+    if (window.storage && typeof window.storage.set === 'function') {
+      return await window.storage.set(key, value, true);
+    }
+    localStorage.setItem(key, value);
     return true;
   },
 

@@ -105,7 +105,7 @@ export default function CartDrawer({
     };
 
     try {
-      await storage.set(`order:${orderId}`, JSON.stringify(orderData), true);
+      await storage.createOrder(orderData);
       onOrderSubmitted(orderData);
       setFlowDirection('forward');
       onStepChange('confirm');
