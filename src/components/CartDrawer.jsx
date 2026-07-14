@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Check, Copy, Upload, X, ChevronRight } from 'lucide-react';
+import { Check, Copy, X, ChevronRight } from 'lucide-react';
 import { fmt, WHATSAPP_NUMBER_DISPLAY, WHATSAPP_NUMBER_INTL } from '../js/products';
 import { storage } from '../js/storage';
 import { panelSpring, premiumEase, premiumSpring } from '../js/motion';
@@ -33,10 +33,6 @@ export default function CartDrawer({
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [notes, setNotes] = useState('');
-  const [screenshot, setScreenshot] = useState(null);
-  const [compressing, setCompressing] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -53,34 +49,6 @@ export default function CartDrawer({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [step, onClose]);
 
-  useEffect(() => {
-    if (!compressing) {
-      setUploadProgress((current) => (current > 0 && current < 100 ? 100 : current));
-      return undefined;
-    }
-
-    let mounted = true;
-    let frame = 0;
-    let value = 12;
-    setUploadProgress(12);
-
-    const tick = () => {
-      if (!mounted) return;
-      value = Math.min(value + 4, 90);
-      setUploadProgress(value);
-      if (value < 90) {
-        frame = window.setTimeout(tick, 90);
-      }
-    };
-
-    frame = window.setTimeout(tick, 100);
-
-    return () => {
-      mounted = false;
-      window.clearTimeout(frame);
-    };
-  }, [compressing]);
-
   const generateOrderId = () =>
     `SB-${Date.now().toString(36).toUpperCase().slice(-5)}${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
 
@@ -94,72 +62,6 @@ export default function CartDrawer({
     }
   };
 
-  const compressImage = (file) => {
-    if (!file) return;
-    setFormError('');
-    setCompressing(true);
-    setUploadProgress(10);
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-        const maxDim = 1280;
-
-        if (width > maxDim || height > maxDim) {
-          if (width > height) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
-          } else {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.76);
-        setScreenshot(dataUrl);
-        setUploadProgress(100);
-        window.setTimeout(() => {
-          setCompressing(false);
-        }, 220);
-      };
-      img.onerror = () => {
-        setCompressing(false);
-        setUploadProgress(0);
-        setFormError('تعذر تحميل الصورة، يرجى اختيار صورة أخرى.');
-      };
-      img.src = event.target.result;
-    };
-    reader.onerror = () => {
-      setCompressing(false);
-      setUploadProgress(0);
-      setFormError('تعذر قراءة الملف، يرجى المحاولة مرة أخرى.');
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleFileChange = (event) => {
-    if (event.target.files?.[0]) {
-      compressImage(event.target.files[0]);
-    }
-  };
-
-  const handleDrop = (event) => {
-    event.preventDefault();
-    setDragOver(false);
-    if (event.dataTransfer.files?.[0]) {
-      compressImage(event.dataTransfer.files[0]);
-    }
-  };
-
   const validate = () => {
     const nextErrors = {};
 
@@ -167,7 +69,6 @@ export default function CartDrawer({
     if (!phone.trim()) nextErrors.phone = 'الرجاء إدخال رقم الموبايل';
     else if (!/^05\d{8}$/.test(phone.trim())) nextErrors.phone = 'رقم الموبايل غير صحيح (مثال: 0512345678)';
     if (!address.trim()) nextErrors.address = 'الرجاء إدخال عنوان التوصيل بالتفصيل';
-    if (!screenshot) nextErrors.screenshot = 'الرجاء رفع لقطة شاشة لإتمام التحويل';
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
@@ -192,7 +93,6 @@ export default function CartDrawer({
       phone: phone.trim(),
       address: address.trim(),
       notes: notes.trim(),
-      screenshot,
       items: cartEntries.map((item) => ({
         id: item.id,
         name: item.name,
@@ -238,7 +138,7 @@ export default function CartDrawer({
     const itemsText = lastOrder.items
       .map((item) => `- ${item.name} (${item.qty} ×) = ${fmt(item.price * item.qty)}`)
       .join('\n');
-    const message = `طلب جديد من SIDE BURGER\n\nرقم الطلب: ${lastOrder.id}\nالاسم: ${lastOrder.name}\nالموبايل: ${lastOrder.phone}\nالعنوان: ${lastOrder.address}\n\nالطلبات:\n${itemsText}\n\nإجمالي الحساب: ${fmt(lastOrder.total)}\n\nتم إرفاق صورة التحويل بالطلب.`;
+    const message = `طلب جديد من SIDE BURGER\n\nرقم الطلب: ${lastOrder.id}\nالاسم: ${lastOrder.name}\nالموبايل: ${lastOrder.phone}\nالعنوان: ${lastOrder.address}\n\nالطلبات:\n${itemsText}\n\nإجمالي الحساب: ${fmt(lastOrder.total)}\n\n(يرجى إرفاق صورة إثبات التحويل مع هذه الرسالة)`;
     window.open(`https://wa.me/${WHATSAPP_NUMBER_INTL}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
   };
 
@@ -541,7 +441,7 @@ export default function CartDrawer({
                   <div className="pay-box">
                     <h4>خطوات الدفع عبر التحويل البنكي / المحفظة الرقمية</h4>
                     <p>
-                      قم بتحويل إجمالي المبلغ <strong>{fmt(cartTotal)}</strong> إلى الرقم التالي، ثم ارفع لقطة شاشة التحويل.
+                      قم بتحويل إجمالي المبلغ <strong>{fmt(cartTotal)}</strong> إلى الرقم التالي، ثم أرسل لقطة شاشة التحويل عبر واتساب بعد تأكيد الطلب.
                     </p>
                     <div className="pay-number-row">
                       <b dir="ltr">{WHATSAPP_NUMBER_DISPLAY}</b>
@@ -561,88 +461,10 @@ export default function CartDrawer({
                     </div>
                   </div>
 
-                  <div
-                    className={`upload-box ${dragOver ? 'drag-over' : ''} ${screenshot ? 'has-file' : ''} ${errors.screenshot ? 'invalid' : ''}`}
-                    onDragOver={(event) => {
-                      event.preventDefault();
-                      setDragOver(true);
-                    }}
-                    onDragLeave={(event) => {
-                      event.preventDefault();
-                      setDragOver(false);
-                    }}
-                    onDrop={handleDrop}
-                  >
-                    <input id="screenshot-input" type="file" accept="image/*" onChange={handleFileChange} className="upload-input" aria-label="رفع لقطة شاشة التحويل" />
-
-                    <AnimatePresence mode="wait" initial={false}>
-                      {compressing ? (
-                        <motion.div
-                          key="processing"
-                          className="upload-processing"
-                          initial={{ opacity: 0, scale: 0.98 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.98 }}
-                        >
-                          <motion.div
-                            className="spinner"
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                          />
-                          <span>جارٍ معالجة الصورة وتهيئتها...</span>
-                        </motion.div>
-                      ) : screenshot ? (
-                        <motion.div
-                          key="preview"
-                          className="upload-preview"
-                          initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                          transition={prefersReduced ? { duration: 0 } : { duration: 0.26, ease: premiumEase }}
-                        >
-                          <img src={screenshot} alt="لقطة التحويل" />
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          key="placeholder"
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 8 }}
-                        >
-                          <Upload size={30} />
-                          <div className="ut">اسحب وأسقط لقطة التحويل هنا، أو انقر للاختيار</div>
-                          <div className="ut" style={{ marginTop: 6, color: 'var(--cream-dimmer)', fontSize: 12 }}>
-                            سيتم ضغط الصورة تلقائياً قبل الإرسال
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    {compressing && (
-                      <div style={{ marginTop: 14 }}>
-                        <div className="skeleton skeleton-line w100" style={{ height: 8, marginBottom: 8 }} />
-                        <div style={{ color: 'var(--cream-dimmer)', fontSize: 12 }}>{uploadProgress}%</div>
-                      </div>
-                    )}
-                  </div>
-
-                  <AnimatePresence initial={false}>
-                    {errors.screenshot && (
-                      <motion.div
-                        className="field-error"
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -4 }}
-                      >
-                        {errors.screenshot}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
                   <motion.button
                     type="submit"
                     className="btn btn-primary btn-block"
-                    disabled={submitting || compressing}
+                    disabled={submitting}
                     whileHover={prefersReduced ? {} : { scale: 1.02 }}
                     whileTap={prefersReduced ? {} : { scale: 0.97 }}
                   >
@@ -701,7 +523,7 @@ export default function CartDrawer({
                 <div className="confirm-id">{lastOrder?.id}</div>
 
                 <p>
-                  الخطوة الأخيرة: اضغط على الزر بالأسفل لإرسال تفاصيل الطلب وإيصال الدفع إلى خدمة العملاء عبر واتساب.
+                  الخطوة الأخيرة: اضغط على الزر بالأسفل لإرسال تفاصيل الطلب عبر واتساب، وأرفق لقطة شاشة التحويل مع الرسالة.
                 </p>
 
                 <div style={{ display: 'grid', gap: 10, marginTop: 22 }}>
