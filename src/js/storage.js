@@ -30,8 +30,13 @@ const uploadScreenshot = async (orderId, screenshot) => {
   const extension = blob.type === 'image/png' ? 'png' : 'jpg';
   const path = `${orderId}/${Date.now()}.${extension}`;
 
+  // Not upsert: true. The path already includes Date.now(), so it can
+  // never collide with an existing object, and the customer-facing anon
+  // role is only granted INSERT on this bucket (not UPDATE) - Supabase's
+  // upsert path requires update-capable RLS even when nothing actually
+  // conflicts, which fails for anon and isn't needed here anyway.
   const { error } = await supabase.storage.from(ORDER_BUCKET).upload(path, blob, {
-    upsert: true,
+    upsert: false,
     contentType: blob.type || 'image/jpeg',
   });
 
