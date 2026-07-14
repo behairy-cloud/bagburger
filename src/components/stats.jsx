@@ -67,8 +67,8 @@ export function DashboardStats({ summary }) {
 function StatCard({ stat }) {
 	const { label, value, delta, hint } = stat;
 	return (
-        <Card className="relative overflow-hidden group border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.015)] shadow-[0_10px_24px_-12px_rgba(0,0,0,0.5)] transition-all duration-300 hover:shadow-[0_14px_34px_-12px_rgba(0,0,0,0.7)] hover:border-[rgba(255,107,53,0.25)] hover:-translate-y-0.5">
-            <div className="absolute inset-0 bg-gradient-to-br from-[rgba(255,107,53,0.04)] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none" />
+        <Card className="relative overflow-hidden group border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.015)] shadow-[0_10px_24px_-12px_rgba(0,0,0,0.5)] transition-all duration-300 hover:shadow-[0_14px_34px_-12px_rgba(0,0,0,0.7)] hover:border-[rgba(245,196,0,0.25)] hover:-translate-y-0.5">
+            <div className="absolute inset-0 bg-gradient-to-br from-[rgba(245,196,0,0.04)] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none" />
             <CardHeader className="pb-2">
 				<CardTitle className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
 					{label}

@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ShoppingBag, Phone } from 'lucide-react';
 import { premiumEase, premiumSpring } from '../js/motion';
 import { WHATSAPP_NUMBER_INTL } from '../js/products';
+import { LogoIcon } from './logo';
 
 export default function Topbar({ cartCount, cartBounce, onCartClick }) {
   const prefersReduced = useReducedMotion();
@@ -17,20 +18,7 @@ export default function Topbar({ cartCount, cartBounce, onCartClick }) {
             whileTap={prefersReduced ? {} : { scale: 0.95 }}
             transition={prefersReduced ? { duration: 0 } : premiumSpring}
           >
-            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <rect width="40" height="40" rx="10" fill="#FF4500"/>
-              <rect width="40" height="40" rx="10" fill="url(#topbar-logo-grad)"/>
-              <defs>
-                <linearGradient id="topbar-logo-grad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#FF6B35"/>
-                  <stop offset="1" stopColor="#FF4500"/>
-                </linearGradient>
-              </defs>
-              {/* Burger icon paths */}
-              <rect x="9" y="13" width="22" height="3.5" rx="1.75" fill="white"/>
-              <rect x="9" y="18.5" width="22" height="3.5" rx="1.75" fill="white" opacity="0.7"/>
-              <rect x="9" y="24" width="22" height="3.5" rx="1.75" fill="white" opacity="0.4"/>
-            </svg>
+            <LogoIcon width={40} height={40} aria-hidden="true" />
           </motion.div>
           <div className="brand-mini-text">
             <span className="brand-mini-name">SIDE</span>

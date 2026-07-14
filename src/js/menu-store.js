@@ -1,6 +1,7 @@
 import { PRODUCTS, CATEGORIES } from './products.js';
-import { menuImageFor, resolveMenuImageSource } from './menu-images.js';
+import { resolveMenuImageSource } from './menu-images.js';
 import { MENU_IMAGE_BUCKET, supabase, supabaseEnabled } from './supabase.js';
+import { squareCropToInstagramSize } from './image-resize.js';
 export const MENU_TABLE = 'menu_items';
 
 const CATEGORY_LABELS = new Map(CATEGORIES.map((category) => [category.key, category.label]));
@@ -16,7 +17,7 @@ export const DEFAULT_MENU_ITEMS = PRODUCTS.map((product, index) => ({
   ...product,
   categoryKey: product.cat,
   categoryLabel: CATEGORY_LABELS.get(product.cat) || product.cat,
-  imagePath: menuImageFor(product),
+  imagePath: '',
   isVisible: true,
   sortOrder: index,
 }));
@@ -27,7 +28,7 @@ const toRow = (item) => ({
   name: normalizeText(item.name),
   note: normalizeText(item.note),
   price: Number(item.price) || 0,
-  image_path: normalizeText(item.imagePath || item.image_path) || menuImageFor(item),
+  image_path: normalizeText(item.imagePath || item.image_path),
   is_visible: toBoolean(item.isVisible ?? item.is_visible, true),
   sort_order: Number(item.sortOrder ?? item.sort_order ?? 0),
   ...(item.createdAt ? { created_at: new Date(item.createdAt).toISOString() } : {}),
@@ -42,7 +43,7 @@ const fromRow = (row, index = 0) => ({
   name: row.name || '',
   note: row.note || '',
   price: Number(row.price) || 0,
-  imagePath: row.image_path || menuImageFor({ name: row.name, cat: row.category_key }),
+  imagePath: row.image_path || '',
   isVisible: row.is_visible !== false,
   sortOrder: Number(row.sort_order ?? index),
   createdAt: row.created_at ? new Date(row.created_at).getTime() : Date.now(),
@@ -100,7 +101,8 @@ export async function uploadMenuImage(file, itemId = crypto.randomUUID()) {
   if (!supabaseEnabled || !supabase) throw new Error('Supabase is not configured.');
   if (!(file instanceof File)) throw new Error('Invalid image file.');
 
-  const extension = file.name?.split('.').pop()?.toLowerCase() || file.type?.split('/')?.[1] || 'jpg';
+  const resized = await squareCropToInstagramSize(file);
+
   let safeName = file.name ? file.name.replace(/\.[^.]+$/, '') : 'image';
   safeName = safeName
     .replace(/[^a-zA-Z0-9\-_]+/g, '-')
@@ -109,11 +111,11 @@ export async function uploadMenuImage(file, itemId = crypto.randomUUID()) {
     .slice(0, 40);
   if (!safeName) safeName = 'image';
 
-  const objectPath = `${itemId}/${Date.now()}-${safeName}.${extension}`;
+  const objectPath = `${itemId}/${Date.now()}-${safeName}.jpg`;
 
   // FIX: was using supabaseAuth.storage — must use supabase.storage
-  const { error } = await supabase.storage.from(MENU_IMAGE_BUCKET).upload(objectPath, file, {
-    contentType: file.type || 'image/jpeg',
+  const { error } = await supabase.storage.from(MENU_IMAGE_BUCKET).upload(objectPath, resized, {
+    contentType: 'image/jpeg',
   });
 
   if (error) throw error;
@@ -121,6 +123,18 @@ export async function uploadMenuImage(file, itemId = crypto.randomUUID()) {
     path: `${MENU_IMAGE_BUCKET}/${objectPath}`,
     url: resolveMenuImageSource(`${MENU_IMAGE_BUCKET}/${objectPath}`),
   };
+}
+
+export async function deleteMenuImage(imagePath) {
+  if (!supabaseEnabled || !supabase) throw new Error('Supabase is not configured.');
+  const path = normalizeText(imagePath);
+  const prefix = `${MENU_IMAGE_BUCKET}/`;
+  if (!path.startsWith(prefix)) return false; // not a stored upload (e.g. SVG placeholder) — nothing to remove
+
+  const objectPath = path.slice(prefix.length);
+  const { error } = await supabase.storage.from(MENU_IMAGE_BUCKET).remove([objectPath]);
+  if (error) throw error;
+  return true;
 }
 
 export async function deleteMenuItem(id) {

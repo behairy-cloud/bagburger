@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion';
 import {
-  ShieldCheck,
   RefreshCcw,
   LogOut,
   Image as ImageIcon,
@@ -9,7 +8,6 @@ import {
   LayoutDashboard,
   UtensilsCrossed,
   ClipboardList,
-  Upload,
   Search,
 } from 'lucide-react';
 import {
@@ -27,7 +25,7 @@ import { premiumEase, premiumSpring } from '../js/motion';
 import { Dashboard } from './dashboard';
 import { DashboardSkeleton } from './dashboard-skeleton';
 import MenuManager from './MenuManager';
-import { seedMenuItems, DEFAULT_MENU_ITEMS } from '../js/menu-store';
+import { LogoIcon } from './logo';
 
 const statusOptions = ['الكل', ...ORDER_STATUSES];
 
@@ -69,58 +67,6 @@ function AdminTabBar({ active, onSelect, freshCount, prefersReduced }) {
         })}
       </div>
     </div>
-  );
-}
-
-/* ─── Upload-to-Supabase button (lives in Menu tab header) ───── */
-function SeedButton({ prefersReduced }) {
-  const [status, setStatus] = useState('idle'); // idle | busy | done | error
-  const timerRef = useRef(null);
-
-  useEffect(() => () => window.clearTimeout(timerRef.current), []);
-
-  const handleSeed = async () => {
-    if (status === 'busy') return;
-    setStatus('busy');
-    try {
-      await seedMenuItems(DEFAULT_MENU_ITEMS);
-      setStatus('done');
-      timerRef.current = window.setTimeout(() => setStatus('idle'), 3200);
-    } catch {
-      setStatus('error');
-      timerRef.current = window.setTimeout(() => setStatus('idle'), 3200);
-    }
-  };
-
-  const labels = {
-    idle:  { text: 'استعادة الأصناف', icon: <Upload size={14} /> },
-    busy:  { text: 'جاري الاستعادة…',             icon: <span className="spinner" /> },
-    done:  { text: 'تمت الاستعادة بنجاح ✓',        icon: null },
-    error: { text: 'حدث خطأ، حاول مرة أخرى', icon: null },
-  };
-
-  const current = labels[status];
-
-  return (
-    <motion.button
-      type="button"
-      className={`btn btn-sm${
-        status === 'done'  ? ' btn-primary' :
-        status === 'error' ? ' btn-outline' :
-        ' btn-primary'
-      }`}
-      style={
-        status === 'error'
-          ? { borderColor: 'var(--danger)', color: 'var(--danger)' }
-          : {}
-      }
-      disabled={status === 'busy'}
-      onClick={handleSeed}
-      whileTap={prefersReduced ? {} : { scale: 0.97 }}
-    >
-      {current.icon}
-      {current.text}
-    </motion.button>
   );
 }
 
@@ -462,9 +408,7 @@ export default function AdminDashboard({ onBack, onMenuChange }) {
           transition={prefersReduced ? { duration: 0 } : { duration: 0.34, ease: premiumEase }}
         >
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'linear-gradient(135deg, #FF6B35, #FF4500)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(255,69,0,.4)' }}>
-              <ShieldCheck size={20} color="#fff" />
-            </div>
+            <LogoIcon width={40} height={40} style={{ borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,.5)' }} />
             <div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, letterSpacing: 2, color: 'var(--fire-bright)', lineHeight: 1 }}>SIDE BURGER</div>
               <div style={{ fontSize: 11, color: 'var(--text-dimmer)', letterSpacing: 1 }}>ADMIN PANEL</div>
@@ -565,7 +509,7 @@ export default function AdminDashboard({ onBack, onMenuChange }) {
           {activeTab === 'dashboard' && (
             <motion.div
               key="tab-dashboard"
-              className="admin-tab-panel"
+              className="admin-tab-panel admin-tab-panel-dashboard"
               initial={prefersReduced ? false : { opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={prefersReduced ? {} : { opacity: 0, y: -6 }}
@@ -609,29 +553,6 @@ export default function AdminDashboard({ onBack, onMenuChange }) {
               exit={prefersReduced ? {} : { opacity: 0, y: -6 }}
               transition={{ duration: prefersReduced ? 0 : 0.26, ease: premiumEase }}
             >
-              {/* Upload stripe */}
-              <div style={{
-                paddingTop: 20,
-                paddingBottom: 4,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 14,
-                flexWrap: 'wrap',
-                marginBottom: 6,
-              }}>
-                <div>
-                  <div style={{ color: 'var(--text-dimmer)', fontSize: 12, marginBottom: 4, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                    استعادة المنيو الأساسي
-                  </div>
-                  <div style={{ color: 'var(--text-dim)', fontSize: 13 }}>
-                    إضافة جميع منتجات SIDE BURGER الافتراضية إلى قائمتك بضغطة واحدة.
-                  </div>
-                </div>
-                <SeedButton prefersReduced={prefersReduced} />
-              </div>
-
-              <div className="admin-tab-divider" />
               <MenuManager onChange={onMenuChange} />
             </motion.div>
           )}

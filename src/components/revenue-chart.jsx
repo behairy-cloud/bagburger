@@ -88,7 +88,7 @@ export function RevenueChart({ rows = [], onViewOrders }) {
                             cursor={{ stroke: 'var(--chart-1)', strokeWidth: 1, strokeDasharray: '4 4' }}
                             content={
 								<ChartTooltipContent
-                                    className="min-w-36 border-[rgba(255,107,53,0.2)] bg-[rgba(21,15,11,0.85)] backdrop-blur-md"
+                                    className="min-w-36 border-[rgba(245,196,0,0.2)] bg-[rgba(21,15,11,0.85)] backdrop-blur-md"
                                     indicator="line"
                                     labelFormatter={(_, payload) => payload?.[0]?.payload?.fullDate || ""}
                                 />

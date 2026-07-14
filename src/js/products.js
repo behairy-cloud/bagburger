@@ -1,5 +1,5 @@
-export const WHATSAPP_NUMBER_DISPLAY = "0500000000";
-export const WHATSAPP_NUMBER_INTL    = "966500000000";
+export const WHATSAPP_NUMBER_DISPLAY = "0548800602";
+export const WHATSAPP_NUMBER_INTL    = "966548800602";
 
 export const CATEGORIES = [
   { key: 'special-burger',  label: 'البرجر المميز',       emoji: '🔥', desc: 'برجر حجم كبير بتتبيلات خاصة تحسسك بالفرق' },
@@ -82,9 +82,9 @@ export const setMenuProducts = (items = []) => {
 export const ORDER_STATUSES = ['جديد', 'تم التأكيد', 'جاري التحضير', 'تم التوصيل', 'ملغي'];
 
 export const STATUS_COLORS = {
-  'جديد':           { bg: 'rgba(255,100,30,.18)',  fg: '#FF6B35' },
+  'جديد':           { bg: 'rgba(245,196,0,.18)',   fg: '#FFD84D' },
   'تم التأكيد':     { bg: 'rgba(255,179,0,.18)',   fg: '#FFB300' },
-  'جاري التحضير':   { bg: 'rgba(255,69,0,.2)',     fg: '#FF4500' },
+  'جاري التحضير':   { bg: 'rgba(232,69,47,.2)',    fg: '#E8452F' },
   'تم التوصيل':     { bg: 'rgba(91,140,90,.28)',   fg: '#5B8C5A' },
   'ملغي':           { bg: 'rgba(168,38,74,.22)',   fg: '#C24569' },
 };

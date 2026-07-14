@@ -7,14 +7,17 @@ import {
   Plus,
   RotateCcw,
   Save,
+  Search,
   Trash2,
   Upload,
+  X,
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { CATEGORIES, fmt } from '../js/products';
 import {
   DEFAULT_MENU_ITEMS,
+  deleteMenuImage,
   deleteMenuItem,
   loadMenuItems,
   seedMenuItems,
@@ -26,6 +29,20 @@ import { resolveMenuImageSource } from '../js/menu-images';
 const CATEGORY_OPTIONS = CATEGORIES;
 
 const normalizeText = (value = '') => String(value ?? '').trim();
+
+const normalizeSearchText = (value = '') =>
+  String(value ?? '')
+    .toLowerCase()
+    .replace(/[أإآا]/g, 'ا')
+    .replace(/[ةه]/g, 'ه')
+    .replace(/[يى]/g, 'ي')
+    .replace(/[ًٌٍَُِّْ]/g, '');
+
+const VISIBILITY_FILTERS = [
+  { key: 'all', label: 'الكل' },
+  { key: 'visible', label: 'ظاهر' },
+  { key: 'hidden', label: 'مخفي' },
+];
 
 const createDraft = () => ({
   id: crypto.randomUUID(),
@@ -54,12 +71,12 @@ const toEditableItem = (item, sortOrder = 0) => ({
 
 function MenuImagePicker({
   value,
-  fallback,
   gallery = [],
   title = 'صورة الصنف',
   hint = 'اسحب صورة هنا أو اختر من المعرض',
   onFile,
   onPick,
+  onRemove,
   className = '',
   compact = false,
   busy = false,
@@ -134,7 +151,24 @@ function MenuImagePicker({
 
         <div className="menu-image-preview">
           {value ? (
-            <img src={resolveMenuImageSource(value, fallback)} alt="" />
+            <>
+              <img src={resolveMenuImageSource(value)} alt="" />
+              {onRemove && (
+                <button
+                  type="button"
+                  className="menu-image-remove"
+                  title="حذف الصورة"
+                  aria-label="حذف الصورة"
+                  disabled={busy}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onRemove();
+                  }}
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </>
           ) : (
             <div className="menu-image-empty">
               <Images />
@@ -182,7 +216,7 @@ function MenuImagePicker({
               title="اختيار الصورة"
               aria-label={`اختيار الصورة ${index + 1}${selected ? ' (محددة)' : ''}`}
             >
-              <img src={resolveMenuImageSource(path, fallback)} alt="" />
+              <img src={resolveMenuImageSource(path)} alt="" />
             </button>
           );
         })}
@@ -199,6 +233,9 @@ export default function MenuManager({ onChange }) {
   const [savingId, setSavingId] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [visibilityFilter, setVisibilityFilter] = useState('all');
   const messageTimerRef = useRef(null);
   const removeTimerRef = useRef(null);
   const uploadTimerRef = useRef(null);
@@ -216,6 +253,27 @@ export default function MenuManager({ onChange }) {
     () => uniqueGalleryImages([...DEFAULT_MENU_ITEMS, ...items]),
     [items]
   );
+
+  const categoryCounts = useMemo(() => {
+    const counts = new Map();
+    items.forEach((item) => counts.set(item.categoryKey, (counts.get(item.categoryKey) || 0) + 1));
+    return counts;
+  }, [items]);
+
+  const filteredItems = useMemo(() => {
+    const query = normalizeSearchText(searchTerm).trim();
+    const queryWords = query.split(/\s+/).filter(Boolean);
+
+    return items.filter((item) => {
+      if (categoryFilter !== 'all' && item.categoryKey !== categoryFilter) return false;
+      if (visibilityFilter === 'visible' && !item.isVisible) return false;
+      if (visibilityFilter === 'hidden' && item.isVisible) return false;
+      if (queryWords.length === 0) return true;
+
+      const haystack = normalizeSearchText(`${item.name} ${item.note}`);
+      return queryWords.every((word) => haystack.includes(word));
+    });
+  }, [items, searchTerm, categoryFilter, visibilityFilter]);
 
   const syncParent = useCallback(
     (nextItems) => {
@@ -347,6 +405,35 @@ export default function MenuManager({ onChange }) {
     [draft.id, persistItem]
   );
 
+  const handleRemoveImage = useCallback(
+    async (targetItem) => {
+      const itemId = targetItem?.id || draft.id;
+      const currentPath = targetItem ? targetItem.imagePath : draft.imagePath;
+      if (!currentPath) return;
+      if (!window.confirm('هل تريد حذف هذه الصورة؟')) return;
+
+      setSavingId(itemId);
+      setError('');
+      try {
+        await deleteMenuImage(currentPath);
+        if (targetItem) {
+          const next = { ...targetItem, imagePath: '' };
+          await persistItem(next, { quiet: true });
+        } else {
+          setDraft((prev) => ({ ...prev, imagePath: '' }));
+        }
+        setMessage('تم حذف الصورة.');
+        window.clearTimeout(uploadTimerRef.current);
+        uploadTimerRef.current = window.setTimeout(() => setMessage(''), 2200);
+      } catch (removeError) {
+        setError('تعذر حذف الصورة.');
+      } finally {
+        setSavingId('');
+      }
+    },
+    [draft.id, draft.imagePath, persistItem]
+  );
+
   const saveDraft = useCallback(async () => {
     if (!draft.name.trim()) {
       setError('أضف اسم الصنف أولاً.');
@@ -400,10 +487,12 @@ export default function MenuManager({ onChange }) {
   const toggleVisibility = useCallback(
     async (item) => {
       const next = { ...item, isVisible: !item.isVisible };
-      updateItem(item.id, next);
-      await persistItem(next, { quiet: true });
+      const saved = await persistItem(next, { quiet: true });
+      if (saved === false) {
+        setError('تعذر تحديث ظهور الصنف. أعد تسجيل الدخول وحاول مرة أخرى.');
+      }
     },
-    [persistItem, updateItem]
+    [persistItem]
   );
 
   const reseedCatalog = useCallback(async () => {
@@ -522,13 +611,13 @@ export default function MenuManager({ onChange }) {
           <div className="menu-image-field">
             <MenuImagePicker
               value={draft.imagePath}
-              fallback={draft}
               gallery={galleryImages}
               title="صورة الصنف الجديد"
               hint="اسحب صورة أو اختر من صور المنيو الحالية"
               busy={savingId === draft.id}
               onFile={(file) => handleUpload(file, null)}
               onPick={(path) => onDraftField('imagePath', path)}
+              onRemove={draft.imagePath ? () => handleRemoveImage(null) : undefined}
             />
           </div>
         </div>
@@ -546,9 +635,58 @@ export default function MenuManager({ onChange }) {
         </div>
       </div>
 
+      <div className="menu-filter-bar">
+        <div className="search-box">
+          <Search size={18} className="search-box-icon" aria-hidden="true" />
+          <input
+            type="text"
+            className="search-box-input"
+            aria-label="بحث في الأصناف"
+            placeholder="ابحث بالاسم أو الملاحظة..."
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+          />
+        </div>
+
+        <div className="filter-row">
+          <button
+            type="button"
+            className={`filter-pill${categoryFilter === 'all' ? ' active' : ''}`}
+            onClick={() => setCategoryFilter('all')}
+          >
+            <span className="filter-pill-label">كل الأقسام</span>
+            <span className="filter-pill-count">{items.length}</span>
+          </button>
+          {CATEGORY_OPTIONS.map((category) => (
+            <button
+              key={category.key}
+              type="button"
+              className={`filter-pill${categoryFilter === category.key ? ' active' : ''}`}
+              onClick={() => setCategoryFilter(category.key)}
+            >
+              <span className="filter-pill-label">{category.label}</span>
+              <span className="filter-pill-count">{categoryCounts.get(category.key) || 0}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="filter-row">
+          {VISIBILITY_FILTERS.map((option) => (
+            <button
+              key={option.key}
+              type="button"
+              className={`filter-pill${visibilityFilter === option.key ? ' active' : ''}`}
+              onClick={() => setVisibilityFilter(option.key)}
+            >
+              <span className="filter-pill-label">{option.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="menu-admin-list">
         <AnimatePresence initial={false}>
-          {items.map((item, index) => (
+          {filteredItems.map((item, index) => (
             <motion.article
               key={item.id}
               className={`menu-admin-row${item.isVisible ? '' : ' is-hidden'}`}
@@ -561,7 +699,6 @@ export default function MenuManager({ onChange }) {
               <div className="menu-admin-thumb">
                 <MenuImagePicker
                   value={item.imagePath}
-                  fallback={item}
                   gallery={galleryImages}
                   title={item.name || 'صورة الصنف'}
                   hint="اسحب أو اختر"
@@ -573,6 +710,7 @@ export default function MenuManager({ onChange }) {
                     updateItem(item.id, next);
                     void saveExisting(next);
                   }}
+                  onRemove={item.imagePath ? () => handleRemoveImage(item) : undefined}
                 />
               </div>
 
@@ -666,6 +804,24 @@ export default function MenuManager({ onChange }) {
 
       {!loading && items.length === 0 && (
         <div className="menu-admin-empty">لا توجد أصناف حالياً. أضف أول صنف من الأعلى.</div>
+      )}
+      {!loading && items.length > 0 && filteredItems.length === 0 && (
+        <div className="menu-admin-empty">
+          لا توجد أصناف مطابقة لهذا البحث.
+          <br />
+          <button
+            type="button"
+            className="btn btn-outline btn-sm"
+            style={{ marginTop: 12 }}
+            onClick={() => {
+              setSearchTerm('');
+              setCategoryFilter('all');
+              setVisibilityFilter('all');
+            }}
+          >
+            إعادة ضبط الفلاتر
+          </button>
+        </div>
       )}
     </section>
   );

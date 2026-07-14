@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Plus, Minus, Flame, Star, Sparkles } from 'lucide-react';
+import { Plus, Minus, Flame, Star, Sparkles, ImageOff } from 'lucide-react';
 import { fmt } from '../js/products';
 import { resolveMenuImageSource } from '../js/menu-images';
 import { hoverSpring, premiumSpring } from '../js/motion';
@@ -13,28 +13,35 @@ const LABEL_CONFIG = {
 
 export default function ProductCard({ product, qty = 0, onAdd, onIncrement, onDecrement }) {
   const prefersReduced = useReducedMotion();
-  const imageSrc = resolveMenuImageSource(product.imagePath, product);
+  const imageSrc = resolveMenuImageSource(product.imagePath);
   const labels = product.labels || [];
+  const priceParts = fmt(product.price).split(' ');
 
   return (
     <motion.article
-      className="card menu-card"
+      className="card menu-card-split"
       layout={!prefersReduced}
       whileHover={
         prefersReduced
           ? {}
           : {
-              y: -6,
-              scale: 1.025,
-              boxShadow: '0 28px 52px -16px rgba(0,0,0,.85), 0 0 0 1.5px rgba(255,100,30,.25), 0 0 40px -12px rgba(255,69,0,.3)',
+              y: -4,
+              scale: 1.015,
+              boxShadow: '0 28px 52px -16px rgba(0,0,0,.85), 0 0 0 1.5px rgba(245,196,0,.25), 0 0 40px -12px rgba(245,196,0,.3)',
             }
       }
-      whileTap={prefersReduced ? {} : { scale: 0.982 }}
+      whileTap={prefersReduced ? {} : { scale: 0.986 }}
       transition={prefersReduced ? { duration: 0 } : hoverSpring}
     >
       {/* Product image / visual */}
-      <div className="card-media" aria-hidden="true">
-        <img src={imageSrc} alt="" loading="lazy" decoding="async" />
+      <div className="menu-card-media" aria-hidden="true">
+        {imageSrc ? (
+          <img src={imageSrc} alt="" loading="lazy" decoding="async" />
+        ) : (
+          <div className="menu-card-media-empty">
+            <ImageOff size={26} />
+          </div>
+        )}
         <div className="card-media-overlay" />
         {/* Labels */}
         {labels.length > 0 && (
@@ -53,19 +60,19 @@ export default function ProductCard({ product, qty = 0, onAdd, onIncrement, onDe
         )}
       </div>
 
-      {/* Content */}
-      <div className="card-content">
-        <div className="card-top">
-          <div className="card-name-wrap">
-            <h3 className="card-name">{product.name}</h3>
-            {product.note && <p className="card-note">{product.note}</p>}
-          </div>
-          <div className="card-price-wrap">
-            <span className="card-price">{fmt(product.price)}</span>
-          </div>
+      {/* Gold info block */}
+      <div className="menu-card-info">
+        <div className="menu-card-price-badge" aria-hidden="true">
+          <span className="menu-card-price-num">{priceParts[0]}</span>
+          <span className="menu-card-price-cur">{priceParts[1]}</span>
         </div>
 
-        <div className="card-bottom">
+        <div className="menu-card-info-top">
+          <h3 className="card-name">{product.name}</h3>
+          {product.note && <p className="card-note">{product.note}</p>}
+        </div>
+
+        <div className="menu-card-info-bottom">
           <AnimatePresence mode="wait" initial={false}>
             {qty === 0 ? (
               <motion.button

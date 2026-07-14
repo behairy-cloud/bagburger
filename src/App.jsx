@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, Suspense, lazy } from 'react';
 import { AnimatePresence, MotionConfig, motion, useReducedMotion } from 'framer-motion';
-import { CATEGORIES, PRODUCTS, fmt, productById } from './js/products';
+import { CATEGORIES, PRODUCTS, WHATSAPP_NUMBER_INTL, fmt, productById } from './js/products';
 import { storage } from './js/storage';
 import { DEFAULT_MENU_ITEMS, loadMenuItems } from './js/menu-store';
 import { setMenuProducts } from './js/products';
@@ -9,6 +9,7 @@ import Hero from './components/Hero';
 import CategoryNav from './components/CategoryNav';
 import MenuSection from './components/MenuSection';
 import CartDrawer from './components/CartDrawer';
+import { LogoWordmark } from './components/logo';
 
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 
@@ -21,7 +22,15 @@ export default function App() {
   const [cartBounce, setCartBounce] = useState(0);
   const [menuItems, setMenuItems] = useState(DEFAULT_MENU_ITEMS);
   const [menuLoading, setMenuLoading] = useState(true);
+  const [scrolledPastHero, setScrolledPastHero] = useState(false);
   const prefersReduced = useReducedMotion();
+
+  useEffect(() => {
+    const onScroll = () => setScrolledPastHero(window.scrollY > window.innerHeight * 0.7);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const applyMenuItems = useCallback((items) => {
     setMenuItems(items);
@@ -114,11 +123,13 @@ export default function App() {
   return (
     <MotionConfig reducedMotion="user">
       <>
-        <Topbar
-          cartCount={cartCount}
-          cartBounce={cartBounce}
-          onCartClick={() => setOverlayStep('cart')}
-        />
+        {scrolledPastHero && (
+          <Topbar
+            cartCount={cartCount}
+            cartBounce={cartBounce}
+            onCartClick={() => setOverlayStep('cart')}
+          />
+        )}
         <Hero />
         <CategoryNav activeCategory={activeCategory} />
 
@@ -139,6 +150,20 @@ export default function App() {
             ))}
           </div>
         </main>
+
+        {/* Our Story */}
+        <section id="ourStory" className="story-section">
+          <div className="wrap story-inner">
+            <span className="story-kicker">قصتنا</span>
+            <h2 className="story-title">شغف بالطعم، من أول قضمة</h2>
+            <p className="story-text">
+              SIDE BURGER بدأت من فكرة بسيطة: برجر بمكونات مختارة بعناية، يتحضّر طازة
+              لحظة ما تطلبه، من غير أي مجاملة في الجودة. كل صنف في المنيو بيتعمل بنفس
+              الاهتمام — من اللحمة للصوصات لطريقة التقديم — عشان توصلك تجربة تستاهل
+              اسمنا.
+            </p>
+          </div>
+        </section>
 
         {/* Sticky cart bar */}
         <AnimatePresence>
@@ -192,22 +217,7 @@ export default function App() {
             {/* Brand block */}
             <div className="footer-brand">
               <div className="footer-logo">
-                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="SIDE BURGER" width="48" height="48">
-                  <rect width="48" height="48" rx="12" fill="url(#footer-logo-grad)"/>
-                  <defs>
-                    <linearGradient id="footer-logo-grad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-                      <stop stopColor="#FF6B35"/>
-                      <stop offset="1" stopColor="#FF4500"/>
-                    </linearGradient>
-                  </defs>
-                  <rect x="10" y="15" width="28" height="4.5" rx="2.25" fill="white"/>
-                  <rect x="10" y="22" width="28" height="4.5" rx="2.25" fill="white" opacity="0.7"/>
-                  <rect x="10" y="29" width="28" height="4.5" rx="2.25" fill="white" opacity="0.4"/>
-                </svg>
-                <div className="footer-logo-text">
-                  <span className="footer-logo-side">SIDE</span>
-                  <span className="footer-logo-burger">BURGER</span>
-                </div>
+                <LogoWordmark height={40} />
               </div>
               <p className="footer-tagline">برجر بنكهة لا تُنسى — جودة فاخرة في كل قضمة</p>
             </div>
@@ -223,16 +233,29 @@ export default function App() {
             </div>
 
             {/* Contact */}
-            <div className="footer-col">
+            <div className="footer-col" id="contact">
               <h3 className="footer-col-title">تواصل معنا</h3>
-              <a href="https://wa.me/966500000000" target="_blank" rel="noopener" className="footer-link">
-                📱 واتساب
+              <a href={`https://wa.me/${WHATSAPP_NUMBER_INTL}`} target="_blank" rel="noopener" className="footer-link">
+                📱 واتساب — 0602 880 54 966+
               </a>
-              <a href="https://instagram.com/sideburger" target="_blank" rel="noopener" className="footer-link">
-                📸 انستقرام
+              <a href="https://instagram.com/side_burger" target="_blank" rel="noopener" className="footer-link">
+                📸 انستقرام — side_burger
               </a>
-              <a href="https://twitter.com/sideburger" target="_blank" rel="noopener" className="footer-link">
-                🐦 تويتر
+              <a href="https://tiktok.com/@side.burger" target="_blank" rel="noopener" className="footer-link">
+                🎵 تيك توك — side.burger
+              </a>
+            </div>
+
+            {/* Locations */}
+            <div className="footer-col" id="locations">
+              <h3 className="footer-col-title">موقعنا</h3>
+              <a
+                href="https://maps.google.com/?q=H5F7%2BMP+Ar+Rawdah,+Jeddah+Saudi+Arabia"
+                target="_blank"
+                rel="noopener"
+                className="footer-link"
+              >
+                📍 الروضة، جدة — H5F7+MP
               </a>
             </div>
           </div>

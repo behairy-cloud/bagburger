@@ -83,7 +83,7 @@ export default function MenuSection({
       </header>
 
       <motion.div
-        className="grid products-grid"
+        className="products-grid"
         variants={gridVariants}
         initial="initial"
         whileInView="animate"
