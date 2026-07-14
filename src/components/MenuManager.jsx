@@ -236,6 +236,7 @@ export default function MenuManager({ onChange }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [visibilityFilter, setVisibilityFilter] = useState('all');
+  const [removeConfirmTarget, setRemoveConfirmTarget] = useState(null);
   const messageTimerRef = useRef(null);
   const removeTimerRef = useRef(null);
   const uploadTimerRef = useRef(null);
@@ -405,19 +406,29 @@ export default function MenuManager({ onChange }) {
     [draft.id, persistItem]
   );
 
-  const handleRemoveImage = useCallback(
-    async (targetItem) => {
-      const itemId = targetItem?.id || draft.id;
+  const requestRemoveImage = useCallback(
+    (targetItem) => {
       const currentPath = targetItem ? targetItem.imagePath : draft.imagePath;
       if (!currentPath) return;
-      if (!window.confirm('هل تريد حذف هذه الصورة؟')) return;
+      setRemoveConfirmTarget(targetItem || { isDraft: true });
+    },
+    [draft.imagePath]
+  );
+
+  const handleRemoveImage = useCallback(
+    async (targetItem) => {
+      const isDraft = !targetItem || targetItem.isDraft;
+      const resolvedTarget = isDraft ? null : targetItem;
+      const itemId = resolvedTarget?.id || draft.id;
+      const currentPath = resolvedTarget ? resolvedTarget.imagePath : draft.imagePath;
+      if (!currentPath) return;
 
       setSavingId(itemId);
       setError('');
       try {
         await deleteMenuImage(currentPath);
-        if (targetItem) {
-          const next = { ...targetItem, imagePath: '' };
+        if (resolvedTarget) {
+          const next = { ...resolvedTarget, imagePath: '' };
           await persistItem(next, { quiet: true });
         } else {
           setDraft((prev) => ({ ...prev, imagePath: '' }));
@@ -429,6 +440,7 @@ export default function MenuManager({ onChange }) {
         setError('تعذر حذف الصورة.');
       } finally {
         setSavingId('');
+        setRemoveConfirmTarget(null);
       }
     },
     [draft.id, draft.imagePath, persistItem]
@@ -617,7 +629,7 @@ export default function MenuManager({ onChange }) {
               busy={savingId === draft.id}
               onFile={(file) => handleUpload(file, null)}
               onPick={(path) => onDraftField('imagePath', path)}
-              onRemove={draft.imagePath ? () => handleRemoveImage(null) : undefined}
+              onRemove={draft.imagePath ? () => requestRemoveImage(null) : undefined}
             />
           </div>
         </div>
@@ -710,7 +722,7 @@ export default function MenuManager({ onChange }) {
                     updateItem(item.id, next);
                     void saveExisting(next);
                   }}
-                  onRemove={item.imagePath ? () => handleRemoveImage(item) : undefined}
+                  onRemove={item.imagePath ? () => requestRemoveImage(item) : undefined}
                 />
               </div>
 
@@ -823,6 +835,43 @@ export default function MenuManager({ onChange }) {
           </button>
         </div>
       )}
+
+      <AnimatePresence>
+        {removeConfirmTarget && (
+          <motion.div
+            className="lightbox"
+            style={{ position: 'fixed', inset: 0, zIndex: 90, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setRemoveConfirmTarget(null)}
+          >
+            <motion.div
+              role="alertdialog"
+              aria-modal="true"
+              aria-label="تأكيد حذف الصورة"
+              className="menu-create-card"
+              style={{ maxWidth: 360, textAlign: 'center' }}
+              initial={{ scale: prefersReduced ? 1 : 0.94, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: prefersReduced ? 1 : 0.94, opacity: 0 }}
+              transition={prefersReduced ? { duration: 0 } : { duration: 0.22 }}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <p style={{ marginBottom: 20 }}>هل تريد حذف هذه الصورة؟</p>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+                <Button type="button" variant="outline" onClick={() => setRemoveConfirmTarget(null)}>
+                  إلغاء
+                </Button>
+                <Button type="button" onClick={() => handleRemoveImage(removeConfirmTarget)}>
+                  <Trash2 data-icon="inline-start" />
+                  حذف
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

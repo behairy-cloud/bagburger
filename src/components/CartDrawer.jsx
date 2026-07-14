@@ -38,6 +38,7 @@ export default function CartDrawer({
   const [dragOver, setDragOver] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [errors, setErrors] = useState({});
+  const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [flowDirection, setFlowDirection] = useState('forward');
@@ -81,7 +82,7 @@ export default function CartDrawer({
   }, [compressing]);
 
   const generateOrderId = () =>
-    `TB-${Date.now().toString(36).toUpperCase().slice(-5)}${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
+    `SB-${Date.now().toString(36).toUpperCase().slice(-5)}${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
 
   const handleCopyNumber = async () => {
     try {
@@ -95,6 +96,7 @@ export default function CartDrawer({
 
   const compressImage = (file) => {
     if (!file) return;
+    setFormError('');
     setCompressing(true);
     setUploadProgress(10);
 
@@ -132,14 +134,14 @@ export default function CartDrawer({
       img.onerror = () => {
         setCompressing(false);
         setUploadProgress(0);
-        alert('تعذر تحميل الصورة، يرجى اختيار صورة أخرى.');
+        setFormError('تعذر تحميل الصورة، يرجى اختيار صورة أخرى.');
       };
       img.src = event.target.result;
     };
     reader.onerror = () => {
       setCompressing(false);
       setUploadProgress(0);
-      alert('تعذر قراءة الملف، يرجى المحاولة مرة أخرى.');
+      setFormError('تعذر قراءة الملف، يرجى المحاولة مرة أخرى.');
     };
     reader.readAsDataURL(file);
   };
@@ -182,6 +184,7 @@ export default function CartDrawer({
     if (submitting || !validate()) return;
 
     setSubmitting(true);
+    setFormError('');
     const orderId = generateOrderId();
     const orderData = {
       id: orderId,
@@ -207,18 +210,24 @@ export default function CartDrawer({
       setFlowDirection('forward');
       onStepChange('confirm');
     } catch (error) {
-      alert('حدث خطأ أثناء حفظ الطلب، يرجى المحاولة مرة أخرى.');
+      setFormError(
+        error?.code === 'P0001' && error?.message
+          ? error.message
+          : 'حدث خطأ أثناء حفظ الطلب، يرجى المحاولة مرة أخرى.'
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
   const navigateToCheckout = () => {
+    setFormError('');
     setFlowDirection('forward');
     onStepChange('checkout');
   };
 
   const navigateBackToCart = () => {
+    setFormError('');
     setFlowDirection('backward');
     onStepChange('cart');
   };
@@ -418,6 +427,22 @@ export default function CartDrawer({
                 custom={flowDirection}
               >
                 <form onSubmit={handleSubmitOrder}>
+                  <AnimatePresence initial={false}>
+                    {formError && (
+                      <motion.div
+                        className="field-error"
+                        role="alert"
+                        aria-live="assertive"
+                        style={{ marginBottom: 14, padding: '10px 12px', background: 'rgba(239,68,68,.1)', borderRadius: 8 }}
+                        initial={{ opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                      >
+                        {formError}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   <motion.div className="field" {...inputWrapMotion('name')}>
                     <label htmlFor="checkout-name">الاسم بالكامل *</label>
                     <input
@@ -513,7 +538,7 @@ export default function CartDrawer({
                   </div>
 
                   <div className="pay-box">
-                    <h4>خطوات التحويل فودافون كاش / إنستا باي</h4>
+                    <h4>خطوات الدفع عبر التحويل البنكي / المحفظة الرقمية</h4>
                     <p>
                       قم بتحويل إجمالي المبلغ <strong>{fmt(cartTotal)}</strong> إلى الرقم التالي، ثم ارفع لقطة شاشة التحويل.
                     </p>

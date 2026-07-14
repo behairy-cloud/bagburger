@@ -17,5 +17,19 @@ export default defineConfig({
       ignored: ['**/*.mp4', '**/*.mov', '**/*.avi', '**/*.webm', '**/*.mkv'],
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // Split rarely-changing vendor libs into their own chunks so browsers
+        // cache them across deploys instead of re-downloading on every app update.
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-motion': ['framer-motion'],
+          'vendor-supabase': ['@supabase/supabase-js'],
+          'vendor-charts': ['recharts'],
+        },
+      },
+    },
+  },
 });
 

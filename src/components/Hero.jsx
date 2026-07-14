@@ -36,7 +36,7 @@ export default function Hero() {
       </div>
 
       <div className="hero-v2-image" aria-hidden="true">
-        <img src="/Hero_.png" alt="" loading="lazy" />
+        <img src="/Hero_.jpg" alt="" loading="eager" fetchpriority="high" />
       </div>
 
       <nav className="hero-v2-nav" aria-label="Primary">

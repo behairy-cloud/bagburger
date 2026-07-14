@@ -52,7 +52,7 @@
   /* Text */
   --text:          #FFFFFF;
   --text-dim:      rgba(255,255,255,.65);
-  --text-dimmer:   rgba(255,255,255,.38);
+  --text-dimmer:   rgba(255,255,255,.5);
 
   /* Semantic */
   --success:       #22c55e;
