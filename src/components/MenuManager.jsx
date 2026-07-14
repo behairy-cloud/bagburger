@@ -77,6 +77,7 @@ function MenuImagePicker({
   onFile,
   onPick,
   onRemove,
+  onDeleteGalleryImage,
   className = '',
   compact = false,
   busy = false,
@@ -205,19 +206,34 @@ function MenuImagePicker({
         {gallery.map((path, index) => {
           const selected = value === path;
           return (
-            <button
-              key={path}
-              type="button"
-              className={selected ? 'is-selected' : ''}
-              onClick={(event) => {
-                event.stopPropagation();
-                onPick?.(path);
-              }}
-              title="اختيار الصورة"
-              aria-label={`اختيار الصورة ${index + 1}${selected ? ' (محددة)' : ''}`}
-            >
-              <img src={resolveMenuImageSource(path)} alt="" />
-            </button>
+            <div key={path} className="menu-image-gallery-item">
+              <button
+                type="button"
+                className={selected ? 'is-selected' : ''}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onPick?.(path);
+                }}
+                title="اختيار الصورة"
+                aria-label={`اختيار الصورة ${index + 1}${selected ? ' (محددة)' : ''}`}
+              >
+                <img src={resolveMenuImageSource(path)} alt="" />
+              </button>
+              {onDeleteGalleryImage && (
+                <button
+                  type="button"
+                  className="menu-image-gallery-delete"
+                  title="حذف الصورة نهائياً"
+                  aria-label={`حذف الصورة ${index + 1} نهائياً`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onDeleteGalleryImage(path);
+                  }}
+                >
+                  <X size={12} />
+                </button>
+              )}
+            </div>
           );
         })}
       </div>
@@ -237,6 +253,7 @@ export default function MenuManager({ onChange }) {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [visibilityFilter, setVisibilityFilter] = useState('all');
   const [removeConfirmTarget, setRemoveConfirmTarget] = useState(null);
+  const [galleryDeleteTarget, setGalleryDeleteTarget] = useState(null);
   const messageTimerRef = useRef(null);
   const removeTimerRef = useRef(null);
   const uploadTimerRef = useRef(null);
@@ -446,6 +463,35 @@ export default function MenuManager({ onChange }) {
     [draft.id, draft.imagePath, persistItem]
   );
 
+  const handleDeleteGalleryImage = useCallback(
+    async (path) => {
+      if (!path) return;
+      setSavingId(path);
+      setError('');
+      try {
+        await deleteMenuImage(path);
+
+        const affectedItems = items.filter((item) => item.imagePath === path);
+        for (const item of affectedItems) {
+          await persistItem({ ...item, imagePath: '' }, { quiet: true });
+        }
+        if (draft.imagePath === path) {
+          setDraft((prev) => ({ ...prev, imagePath: '' }));
+        }
+
+        setMessage('تم حذف الصورة نهائياً من كل الأماكن التي استُخدمت فيها.');
+        window.clearTimeout(uploadTimerRef.current);
+        uploadTimerRef.current = window.setTimeout(() => setMessage(''), 2600);
+      } catch (deleteError) {
+        setError('تعذر حذف الصورة.');
+      } finally {
+        setSavingId('');
+        setGalleryDeleteTarget(null);
+      }
+    },
+    [items, draft.imagePath, persistItem]
+  );
+
   const saveDraft = useCallback(async () => {
     if (!draft.name.trim()) {
       setError('أضف اسم الصنف أولاً.');
@@ -630,6 +676,7 @@ export default function MenuManager({ onChange }) {
               onFile={(file) => handleUpload(file, null)}
               onPick={(path) => onDraftField('imagePath', path)}
               onRemove={draft.imagePath ? () => requestRemoveImage(null) : undefined}
+              onDeleteGalleryImage={(path) => setGalleryDeleteTarget(path)}
             />
           </div>
         </div>
@@ -723,6 +770,7 @@ export default function MenuManager({ onChange }) {
                     void saveExisting(next);
                   }}
                   onRemove={item.imagePath ? () => requestRemoveImage(item) : undefined}
+                  onDeleteGalleryImage={(path) => setGalleryDeleteTarget(path)}
                 />
               </div>
 
@@ -866,6 +914,58 @@ export default function MenuManager({ onChange }) {
                 <Button type="button" onClick={() => handleRemoveImage(removeConfirmTarget)}>
                   <Trash2 data-icon="inline-start" />
                   حذف
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {galleryDeleteTarget && (
+          <motion.div
+            className="lightbox"
+            style={{ position: 'fixed', inset: 0, zIndex: 90, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setGalleryDeleteTarget(null)}
+          >
+            <motion.div
+              role="alertdialog"
+              aria-modal="true"
+              aria-label="تأكيد حذف الصورة نهائياً"
+              className="menu-create-card"
+              style={{ maxWidth: 380, textAlign: 'center' }}
+              initial={{ scale: prefersReduced ? 1 : 0.94, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: prefersReduced ? 1 : 0.94, opacity: 0 }}
+              transition={prefersReduced ? { duration: 0 } : { duration: 0.22 }}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div style={{ width: 96, height: 96, margin: '0 auto 16px', borderRadius: 12, overflow: 'hidden', border: '1px solid var(--line)' }}>
+                <img
+                  src={resolveMenuImageSource(galleryDeleteTarget)}
+                  alt=""
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </div>
+              <p style={{ marginBottom: 8 }}>هل تريد حذف هذه الصورة نهائياً من المعرض؟</p>
+              <p style={{ marginBottom: 20, fontSize: 13, color: 'var(--text-dimmer)' }}>
+                {(() => {
+                  const count = items.filter((item) => item.imagePath === galleryDeleteTarget).length;
+                  return count > 0
+                    ? `سيتم إزالتها أيضاً من ${count} صنف${count > 1 ? '' : ''} تستخدمها حالياً.`
+                    : 'هذه الصورة غير مستخدمة حالياً في أي صنف.';
+                })()}
+              </p>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+                <Button type="button" variant="outline" onClick={() => setGalleryDeleteTarget(null)}>
+                  إلغاء
+                </Button>
+                <Button type="button" onClick={() => handleDeleteGalleryImage(galleryDeleteTarget)}>
+                  <Trash2 data-icon="inline-start" />
+                  حذف نهائياً
                 </Button>
               </div>
             </motion.div>
