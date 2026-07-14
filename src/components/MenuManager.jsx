@@ -758,19 +758,12 @@ export default function MenuManager({ onChange }) {
               <div className="menu-admin-thumb">
                 <MenuImagePicker
                   value={item.imagePath}
-                  gallery={galleryImages}
                   title={item.name || 'صورة الصنف'}
-                  hint="اسحب أو اختر"
+                  hint="اسحب أو ارفع صورة"
                   compact
                   busy={savingId === item.id}
                   onFile={(file) => handleUpload(file, item)}
-                  onPick={(path) => {
-                    const next = { ...item, imagePath: path };
-                    updateItem(item.id, next);
-                    void saveExisting(next);
-                  }}
                   onRemove={item.imagePath ? () => requestRemoveImage(item) : undefined}
-                  onDeleteGalleryImage={(path) => setGalleryDeleteTarget(path)}
                 />
               </div>
 
