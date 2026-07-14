@@ -210,10 +210,11 @@ export default function CartDrawer({
       setFlowDirection('forward');
       onStepChange('confirm');
     } catch (error) {
+      console.error('Order submit failed:', error);
       setFormError(
         error?.code === 'P0001' && error?.message
           ? error.message
-          : 'حدث خطأ أثناء حفظ الطلب، يرجى المحاولة مرة أخرى.'
+          : 'حدث خطأ أثناء حفظ الطلب، يرجى المحاولة مرة أخرى. إذا استمرت المشكلة، تواصل معنا مباشرة عبر واتساب.'
       );
     } finally {
       setSubmitting(false);
