@@ -694,9 +694,13 @@ main { padding: 48px 0 100px; }
 
 @media (max-width: 700px) {
   .menu-card-split { flex-direction: column; height: auto; }
-  .menu-card-media { flex: none; width: 100%; height: auto; aspect-ratio: 1/1; }
+  .menu-card-media { flex: none; width: 100%; height: auto; aspect-ratio: 4/3; }
   .menu-card-info { padding: 22px 14px 12px; }
   .menu-card-price-badge { left: 50%; top: 0; transform: translate(-50%, -50%); }
+}
+
+@media (max-width: 400px) {
+  .menu-card-media { aspect-ratio: 3/2; }
 }
 
 /* Stepper */
@@ -1044,17 +1048,39 @@ input[type="checkbox"] {
 @media (max-width: 700px) {
   main { padding: 32px 0 80px; }
   .cat-section { padding: 28px 0 4px; scroll-margin-top: 120px; }
+  .cat-head { flex-direction: column; align-items: flex-start; }
   .cat-head h2 { font-size: 28px; }
+  .cat-head h2 .cat-emoji { font-size: 24px; }
+  .cat-head-line { display: none; }
 
   .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
 
   .card-name { font-size: 13.5px; }
+  .card-note { font-size: 10px; }
   .btn-add { font-size: 12px; padding: 7px 12px; }
+  .menu-card-price-badge { width: 42px; height: 42px; }
+  .menu-card-price-num { font-size: 12px; }
+  .menu-card-price-cur { font-size: 7px; }
 
   .footer-wrap { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 520px) {
+  .hero { min-height: auto; }
+  .hero-content { padding: 24px 16px 80px; gap: 24px; }
+  .hero-right img { max-height: 260px; }
+  .hero-title { font-size: 32px; }
+  .hero-tagline { font-size: 15px; margin: 14px 0 24px; }
+  .hero-btn { padding: 14px 22px; font-size: 13px; }
+  .hero-features { gap: 16px; }
+  .hero-feature-item { gap: 8px; }
+  .hero-feature-icon { width: 36px; height: 36px; }
+  .hero-feature-icon svg { width: 16px; height: 16px; }
+  .hero-feature-item span { font-size: 11px; }
+  .hero-scroll { display: none !important; }
+  .hero-badge { font-size: 11px; padding: 6px 14px; margin-bottom: 16px; }
+  .hero-ctas { gap: 10px; margin-bottom: 28px; }
+
   .sticky-cart-inner { padding: 10px 10px 10px 14px; gap: 10px; }
   .sticky-cart-inner button { padding: 9px 16px; font-size: 13px; }
 }
