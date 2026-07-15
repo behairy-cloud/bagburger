@@ -17,42 +17,42 @@ const ORDERS_TABLE = 'orders';
 
 // ── Data Banks ────────────────────────────────────────────────────
 const PRODUCTS = [
-  { id: 'p1',  cat: 'shawarma',  name: 'شاورما فراخ', price: 245 },
-  { id: 'p2',  cat: 'shawarma',  name: 'فاهيتا فراخ', price: 245 },
-  { id: 'p6',  cat: 'shish',     name: 'شيش جريل', price: 240 },
-  { id: 'p10', cat: 'shish',     name: 'شيش طاووق', price: 235 },
-  { id: 'p11', cat: 'grill',     name: 'فراخ شوي مشروم', price: 230 },
-  { id: 'p16', cat: 'grill',     name: 'وراك شوي', price: 235 },
-  { id: 'p21', cat: 'wings',     name: 'أجنحة شوي', price: 110 },
-  { id: 'p24', cat: 'panefry',   name: 'بانيه قلي', price: 230 },
-  { id: 'p28', cat: 'panefry',   name: 'كوردون بلو', price: 230 },
-  { id: 'p30', cat: 'panefry',   name: 'فينجرز', price: 240 },
-  { id: 'p31', cat: 'panegrill', name: 'بانيه شوي', price: 245 },
-  { id: 'p42', cat: 'kofta',     name: 'كفتة فراخ', price: 210 },
-  { id: 'p43', cat: 'kofta',     name: 'برجر فراخ', price: 220 },
-  { id: 'p44', cat: 'kofta',     name: 'حواوشي فراخ', price: 300 },
-  { id: 'p45', cat: 'special',   name: 'كبدة فراخ', price: 150 },
-  { id: 'p49', cat: 'special',   name: 'حمام محشي أرز وجوز', price: 225 },
+  { id: 'bb1',  cat: 'beef-burgers',    name: 'Classic Burger', price: 33 },
+  { id: 'bb4',  cat: 'beef-burgers',    name: 'Capital Burger', price: 34 },
+  { id: 'bb6',  cat: 'beef-burgers',    name: 'Signature Burger', price: 37 },
+  { id: 'cb1',  cat: 'chicken-burgers', name: 'Crispy Chicken Burger', price: 38 },
+  { id: 'cb3',  cat: 'chicken-burgers', name: 'Grilled Chicken Burger', price: 35 },
+  { id: 'bm1',  cat: 'beef-meals',      name: 'Classic Burger Meal', price: 39 },
+  { id: 'bm6',  cat: 'beef-meals',      name: 'Signature Burger Meal', price: 43 },
+  { id: 'cm1',  cat: 'chicken-meals',   name: 'Crispy Chicken Burger Meal', price: 43 },
+  { id: 'sd1',  cat: 'sides',           name: 'French Fries', price: 14 },
+  { id: 'sd6',  cat: 'sides',           name: 'Super Bomb', price: 38 },
+  { id: 'sd8',  cat: 'sides',           name: 'Chicken Strips', price: 35 },
+  { id: 'bx1',  cat: 'box',             name: '4 Piece Classic Burger Box', price: 119 },
+  { id: 'bx5',  cat: 'box',             name: 'Mix Box (4 Pcs)', price: 149 },
+  { id: 'bv4',  cat: 'beverages',       name: 'Cola', price: 4 },
+  { id: 'bv6',  cat: 'beverages',       name: 'Citrus', price: 4 },
+  { id: 'bv7',  cat: 'beverages',       name: 'Water', price: 2 },
 ];
 
 const NAMES = [
-  'أحمد حسن', 'محمد علي', 'محمود إبراهيم', 'عمر فاروق', 'طارق مصطفى',
-  'سارة كمال', 'نور عبد الله', 'ياسمين السيد', 'منى سمير', 'هند مجدي',
-  'كريم عادل', 'عمرو دياب', 'رامي سعيد', 'هاني شاكر', 'تامر حسني',
-  'شيرين عبد الوهاب', 'أنغام', 'إليسا', 'نانسي عجرم', 'أصالة',
+  'أحمد حسن', 'محمد علي', 'عمر فاروق', 'طارق مصطفى',
+  'سارة كمال', 'نور عبد الله', 'ياسمين السيد', 'منى سمير',
+  'كريم عادل', 'رامي سعيد', 'خالد المالكي', 'فيصل الدوسري',
+  'نورة القحطاني', 'رهف الشمري', 'سعود العتيبي', 'مشعل الزهراني',
 ];
 
 const ADDRESSES = [
-  'الرحاب، مجموعة ١٥، عمارة ٤',
-  'مدينتي، B1، مجموعة 12، عمارة 5',
-  'التجمع الخامس، النرجس عمارات',
-  'التجمع الأول، مجاورة 3، فيلا 12',
-  'المعادي، شارع 9، عمارة 45',
-  'مدينة نصر، شارع مكرم عبيد',
-  'مصر الجديدة، الكوربة، شارع بغداد',
-  'المهندسين، شارع جامعة الدول',
-  'الدقي، شارع التحرير',
-  'الشيخ زايد، الحي الثامن',
+  'الأندلس، شارع عمر بن عبد العزيز، الرياض',
+  'الرياض، حي النرجس، شارع ابن سينا',
+  'الرياض، حي الياسمين، شارع الجبل',
+  'الرياض، حي الورود، شارع ١٥',
+  'الرياض، حي الملقا، شارع الأمير تركي',
+  'الرياض، حي العقيق، شارع الجوهرة',
+  'الرياض، حي القدس، شارع الحسن بن علي',
+  'الرياض، حي السويدي، شارع عبد الرحمن بن عوف',
+  'الرياض، حي طويق، شارع الملك سلمان',
+  'الرياض، حي الربوة، شارع صلاح الدين',
 ];
 
 const NOTES = [
@@ -71,7 +71,7 @@ const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 const generatePhone = () => {
-  const prefix = rand(['010', '011', '012', '015']);
+  const prefix = '05';
   const suffix = Math.floor(10000000 + Math.random() * 90000000).toString().substring(0, 8);
   return prefix + suffix;
 };
@@ -166,8 +166,8 @@ const seedOrders = async () => {
     return acc;
   }, {});
 
-  console.log('📊 Stats:');
-  console.log(`  - Total Revenue Generated: ${totals.toLocaleString()} ج.م`);
+  console.log('Stats:');
+  console.log(`  - Total Revenue Generated: ${totals.toLocaleString()} SAR`);
   console.log('  - Status Breakdown:');
   Object.entries(statusCounts).forEach(([status, count]) => {
     console.log(`    • ${status}: ${count}`);

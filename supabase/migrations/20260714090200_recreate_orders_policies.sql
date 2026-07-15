@@ -2,7 +2,7 @@
 --   {"code":"42501", message":"new row violates row-level security policy
 --   for table \"orders\""}
 -- This is the same root cause already found and fixed for the
--- order-screenshots storage bucket: 20260621_tatbela_orders.sql runs the
+-- order-screenshots storage bucket: 20260621_bagburger_orders.sql runs the
 -- orders table setup and its four RLS policies *before* two `revoke all`
 -- statements further down the same file (for storage.objects). If that
 -- REVOKE failed when the migration first ran - plausible, since

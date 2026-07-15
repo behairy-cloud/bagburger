@@ -1,4 +1,4 @@
--- Menu image storage for Tatbela
+-- Menu image storage for Bag Burger
 -- Adds the bucket used by the admin menu image picker.
 
 create extension if not exists pgcrypto;

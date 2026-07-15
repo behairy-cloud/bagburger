@@ -5,13 +5,9 @@
  */
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL =
-  import.meta.env.VITE_SUPABASE_URL?.trim() ||
-  'https://tzfpkzxvolnclhvojjwg.supabase.co';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL?.trim() || '';
 
-const SUPABASE_ANON_KEY =
-  import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() ||
-  'sb_publishable_LzRVCo7ZOdCyWih-2AG8Fw_VSM9geCT';
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() || '';
 
 export const supabaseAuth = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
@@ -19,7 +15,7 @@ export const supabaseAuth = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     persistSession: true,
     detectSessionInUrl: false,
     storage: window.localStorage,
-    storageKey: 'sideburger-admin-session',
+    storageKey: 'bagburger-admin-session',
   },
 });
 

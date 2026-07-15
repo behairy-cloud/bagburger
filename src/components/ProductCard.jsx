@@ -27,7 +27,7 @@ export default function ProductCard({ product, qty = 0, onAdd, onIncrement, onDe
           : {
               y: -4,
               scale: 1.015,
-              boxShadow: '0 28px 52px -16px rgba(0,0,0,.85), 0 0 0 1.5px rgba(245,196,0,.25), 0 0 40px -12px rgba(245,196,0,.3)',
+              boxShadow: '0 28px 52px -16px rgba(60,42,0,.22), 0 0 0 1.5px rgba(244,177,40,.3), 0 0 40px -12px rgba(244,177,40,.35)',
             }
       }
       whileTap={prefersReduced ? {} : { scale: 0.986 }}

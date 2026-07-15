@@ -28,10 +28,10 @@ export function TopProductsChart({ rows = [] }) {
 	if (chartRows.length === 0) return null;
 
 	return (
-        <Card className="md:col-span-1 lg:col-span-2 overflow-hidden border-[rgba(244,236,221,0.08)] bg-[rgba(255,255,255,0.015)] shadow-[0_14px_34px_-16px_rgba(0,0,0,0.6)]">
+        <Card className="md:col-span-1 lg:col-span-2 overflow-hidden border-[#F4E6C0] shadow-[0_14px_34px_-16px_rgba(60,42,0,0.14)]">
             <CardHeader className="pb-2">
-				<CardTitle className="text-cream text-lg font-display">الأصناف الأكثر مبيعاً</CardTitle>
-				<CardDescription className="text-cream-dimmer">
+				<CardTitle className="text-foreground text-lg font-display">الأصناف الأكثر مبيعاً</CardTitle>
+				<CardDescription className="text-muted-foreground">
 					أعلى 5 أصناف تم طلبها مؤخراً
 				</CardDescription>
 			</CardHeader>
@@ -49,7 +49,7 @@ export function TopProductsChart({ rows = [] }) {
 								<stop offset="100%" stopColor="var(--chart-1)" stopOpacity={1} />
 							</linearGradient>
 						</defs>
-						<CartesianGrid horizontal={true} vertical={false} strokeDasharray="3 3" stroke="rgba(244,236,221,0.06)" />
+						<CartesianGrid horizontal={true} vertical={false} strokeDasharray="3 3" stroke="rgba(107,107,107,0.15)" />
 						<XAxis 
                             type="number" 
                             axisLine={false} 
@@ -68,10 +68,10 @@ export function TopProductsChart({ rows = [] }) {
                             width={110}
                         />
 						<ChartTooltip
-                            cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+                            cursor={{ fill: 'rgba(244,177,40,0.08)' }}
                             content={
 								<ChartTooltipContent
-                                    className="min-w-36 border-[rgba(217,164,65,0.2)] bg-[rgba(21,15,11,0.85)] backdrop-blur-md"
+                                    className="min-w-36 border-[rgba(244,177,40,0.35)] bg-[rgba(255,255,255,0.97)] backdrop-blur-md"
                                     indicator="line"
                                 />
 							}

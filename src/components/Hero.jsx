@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowRight, Beef, Flame, Award, ChevronDown } from 'lucide-react';
+import { ArrowRight, Beef, Truck, Sparkles, ChevronDown } from 'lucide-react';
 import { premiumEase, premiumSpring } from '../js/motion';
+import { LogoIcon } from './logo';
 
 const NAV_LINKS = [
   { label: 'HOME', href: '#top', active: true },
@@ -10,10 +11,10 @@ const NAV_LINKS = [
   { label: 'CONTACT', href: '#contact' },
 ];
 
-const TRUST_ITEMS = [
+const FEATURE_ITEMS = [
   { icon: Beef, label: ['PREMIUM', 'INGREDIENTS'] },
-  { icon: Flame, label: ['FLAME', 'GRILLED'] },
-  { icon: Award, label: ['QUALITY', 'GUARANTEED'] },
+  { icon: Truck, label: ['FAST', 'DELIVERY'] },
+  { icon: Sparkles, label: ['FRESH', 'EVERYDAY'] },
 ];
 
 export default function Hero() {
@@ -29,22 +30,21 @@ export default function Hero() {
   });
 
   return (
-    <section className="hero-v2" id="top" dir="ltr" lang="en">
-      <div className="hero-v2-bg" aria-hidden="true">
-        <div className="hero-v2-gradient" />
-        <div className="hero-v2-noise" />
+    <section className="hero" id="top" dir="ltr" lang="en">
+      <div className="hero-bg" aria-hidden="true">
+        <div className="hero-blob hero-blob-1" />
+        <div className="hero-blob hero-blob-2" />
+        <div className="hero-blob hero-blob-3" />
+        <div className="hero-lines" />
       </div>
 
-      <div className="hero-v2-image" aria-hidden="true">
-        <img src="/Hero_.jpg" alt="" loading="eager" fetchpriority="high" />
-      </div>
-
-      <nav className="hero-v2-nav" aria-label="Primary">
-        <a href="#top" className="hero-v2-logo" aria-label="Side Burger — home">
-          <img src="/logo-crop-alpha.png" alt="Side Burger — Your Right Side" />
+      <nav className="hero-nav" aria-label="Primary">
+        <a href="#top" className="hero-logo" aria-label="Bag Burger — home">
+          <LogoIcon width={48} height={48} aria-hidden="true" />
+          <span className="hero-logo-text">BAG BURGER</span>
         </a>
 
-        <ul className="hero-v2-links">
+        <ul className="hero-links">
           {NAV_LINKS.map((link) => (
             <li key={link.label}>
               <a href={link.href} className={link.active ? 'is-active' : ''}>
@@ -54,31 +54,31 @@ export default function Hero() {
           ))}
         </ul>
 
-        <a href="#menuRoot" className="hero-v2-order-btn">
+        <a href="#menuRoot" className="hero-order-btn">
           ORDER NOW
         </a>
       </nav>
 
-      <div className="hero-v2-content">
-        <motion.div initial="initial" animate="animate">
-          <motion.h1 className="hero-v2-title" variants={fadeUp(0)} initial="initial" animate="animate">
-            BY YOUR
-            <br />
-            SIDE
+      <div className="hero-content">
+        <motion.div className="hero-left" initial="initial" animate="animate">
+          <motion.span className="hero-badge" variants={fadeUp(0)} initial="initial" animate="animate">
+            🔥 Fresh. Bold. Fast.
+          </motion.span>
+
+          <motion.h1 className="hero-title" variants={fadeUp(0.05)} initial="initial" animate="animate">
+            Big Flavor,<br />
+            In Every <span>Bag</span>
           </motion.h1>
 
-          <motion.div className="hero-v2-rule" variants={fadeUp(0.1)} initial="initial" animate="animate" />
-
-          <motion.p className="hero-v2-tagline" variants={fadeUp(0.15)} initial="initial" animate="animate">
-            Bold flavors. Premium ingredients.
-            <br />
-            Made fresh, just for you.
+          <motion.p className="hero-tagline" variants={fadeUp(0.15)} initial="initial" animate="animate">
+            Bold flavors, premium ingredients, made fresh just for you —
+            the Bag Burger experience, delivered.
           </motion.p>
 
-          <motion.div className="hero-v2-ctas" variants={fadeUp(0.2)} initial="initial" animate="animate">
+          <motion.div className="hero-ctas" variants={fadeUp(0.2)} initial="initial" animate="animate">
             <motion.a
               href="#menuRoot"
-              className="hero-v2-btn hero-v2-btn-primary"
+              className="hero-btn hero-btn-primary"
               whileHover={prefersReduced ? {} : { scale: 1.03 }}
               whileTap={prefersReduced ? {} : { scale: 0.97 }}
               transition={prefersReduced ? { duration: 0 } : premiumSpring}
@@ -88,7 +88,7 @@ export default function Hero() {
             </motion.a>
             <motion.a
               href="#menuRoot"
-              className="hero-v2-btn hero-v2-btn-secondary"
+              className="hero-btn hero-btn-secondary"
               whileHover={prefersReduced ? {} : { scale: 1.03 }}
               whileTap={prefersReduced ? {} : { scale: 0.97 }}
               transition={prefersReduced ? { duration: 0 } : premiumSpring}
@@ -97,10 +97,12 @@ export default function Hero() {
             </motion.a>
           </motion.div>
 
-          <motion.div className="hero-v2-trust" variants={fadeUp(0.25)} initial="initial" animate="animate">
-            {TRUST_ITEMS.map(({ icon: Icon, label }) => (
-              <div className="hero-v2-trust-item" key={label.join(' ')}>
-                <Icon size={26} strokeWidth={1.5} />
+          <motion.div className="hero-features" variants={fadeUp(0.25)} initial="initial" animate="animate">
+            {FEATURE_ITEMS.map(({ icon: Icon, label }) => (
+              <div className="hero-feature-item" key={label.join(' ')}>
+                <span className="hero-feature-icon">
+                  <Icon size={20} strokeWidth={2} />
+                </span>
                 <span>
                   {label[0]}
                   <br />
@@ -110,28 +112,37 @@ export default function Hero() {
             ))}
           </motion.div>
         </motion.div>
+
+        <motion.div
+          className="hero-right"
+          initial={{ opacity: 0, scale: prefersReduced ? 1 : 0.94 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={prefersReduced ? { duration: 0 } : { duration: 0.7, ease: premiumEase, delay: 0.1 }}
+        >
+          <img src="/hero.png" alt="Bag Burger — signature burger" loading="eager" fetchpriority="high" />
+        </motion.div>
       </div>
 
       {!prefersReduced ? (
         <motion.a
           href="#menuRoot"
-          className="hero-v2-scroll"
+          className="hero-scroll"
           aria-label="Scroll down"
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <span className="hero-v2-scroll-mouse">
+          <span className="hero-scroll-mouse">
             <span />
           </span>
-          <span className="hero-v2-scroll-label">SCROLL DOWN</span>
+          <span className="hero-scroll-label">SCROLL DOWN</span>
           <ChevronDown size={14} />
         </motion.a>
       ) : (
-        <a href="#menuRoot" className="hero-v2-scroll" aria-label="Scroll down">
-          <span className="hero-v2-scroll-mouse">
+        <a href="#menuRoot" className="hero-scroll" aria-label="Scroll down">
+          <span className="hero-scroll-mouse">
             <span />
           </span>
-          <span className="hero-v2-scroll-label">SCROLL DOWN</span>
+          <span className="hero-scroll-label">SCROLL DOWN</span>
           <ChevronDown size={14} />
         </a>
       )}

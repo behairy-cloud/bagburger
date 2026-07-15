@@ -41,7 +41,7 @@ export default function CartDrawer({
   const [shakeTrigger, setShakeTrigger] = useState({ key: 0, field: null });
 
   useEffect(() => {
-    if (step === 'confirm') return undefined;
+    if (step === 'confirm') return;
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') onClose();
     };
@@ -50,7 +50,7 @@ export default function CartDrawer({
   }, [step, onClose]);
 
   const generateOrderId = () =>
-    `SB-${Date.now().toString(36).toUpperCase().slice(-5)}${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
+    `BB-${Date.now().toString(36).toUpperCase().slice(-5)}${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
 
   const handleCopyNumber = async () => {
     try {
@@ -66,9 +66,11 @@ export default function CartDrawer({
     const nextErrors = {};
 
     if (!name.trim()) nextErrors.name = 'الرجاء إدخال الاسم بالكامل';
+    else if (name.trim().length < 2) nextErrors.name = 'الاسم قصير جداً';
     if (!phone.trim()) nextErrors.phone = 'الرجاء إدخال رقم الموبايل';
     else if (!/^05\d{8}$/.test(phone.trim())) nextErrors.phone = 'رقم الموبايل غير صحيح (مثال: 0512345678)';
     if (!address.trim()) nextErrors.address = 'الرجاء إدخال عنوان التوصيل بالتفصيل';
+    else if (address.trim().length < 8) nextErrors.address = 'الرجاء كتابة عنوان أكثر تفصيلاً (8 أحرف على الأقل)';
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
@@ -138,7 +140,7 @@ export default function CartDrawer({
     const itemsText = lastOrder.items
       .map((item) => `- ${item.name} (${item.qty} ×) = ${fmt(item.price * item.qty)}`)
       .join('\n');
-    const message = `طلب جديد من SIDE BURGER\n\nرقم الطلب: ${lastOrder.id}\nالاسم: ${lastOrder.name}\nالموبايل: ${lastOrder.phone}\nالعنوان: ${lastOrder.address}\n\nالطلبات:\n${itemsText}\n\nإجمالي الحساب: ${fmt(lastOrder.total)}\n\n(يرجى إرفاق صورة إثبات التحويل مع هذه الرسالة)`;
+    const message = `طلب جديد من BAG BURGER\n\nرقم الطلب: ${lastOrder.id}\nالاسم: ${lastOrder.name}\nالموبايل: ${lastOrder.phone}\nالعنوان: ${lastOrder.address}\n\nالطلبات:\n${itemsText}\n\nإجمالي الحساب: ${fmt(lastOrder.total)}\n\n(يرجى إرفاق صورة إثبات التحويل مع هذه الرسالة)`;
     window.open(`https://wa.me/${WHATSAPP_NUMBER_INTL}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
   };
 

@@ -42,9 +42,9 @@ export function RevenueChart({ rows = [], onViewOrders }) {
 	}, [chartRows]);
 
 	return (
-        <Card className="md:col-span-2 lg:col-span-4 border-[rgba(244,236,221,0.06)] bg-[rgba(255,255,255,0.015)] shadow-[0_14px_34px_-16px_rgba(0,0,0,0.6)]">
+        <Card className="md:col-span-2 lg:col-span-4 border-[#F4E6C0] shadow-[0_14px_34px_-16px_rgba(60,42,0,0.14)]">
             <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-4">
-				<CardTitle className="text-balance text-cream font-display text-lg">إجمالي الطلبات عبر الأيام</CardTitle>
+				<CardTitle className="text-balance text-foreground font-display text-lg">إجمالي الطلبات عبر الأيام</CardTitle>
 				<div className="flex items-center gap-2">
 					{[7, 14, 30].map((value) => (
 						<Button
@@ -54,8 +54,8 @@ export function RevenueChart({ rows = [], onViewOrders }) {
 							size="sm"
 							onClick={() => setPeriodDays(value)}
                             className={periodDays === value 
-                                ? "bg-gradient-to-r from-[var(--chart-2)] to-[var(--chart-1)] text-[#1c1005] hover:opacity-90 font-bold border-0" 
-                                : "border-[rgba(244,236,221,0.1)] text-cream-dimmer hover:text-cream hover:bg-[rgba(255,255,255,0.05)]"}
+                                ? "bg-gradient-to-r from-[var(--chart-2)] to-[var(--chart-1)] text-[#202020] hover:opacity-90 font-bold border-0" 
+                                : "border-[#F4E6C0] text-muted-foreground hover:text-foreground hover:bg-[rgba(244,177,40,0.08)]"}
 						>
 							آخر {value} يوم
 						</Button>
@@ -74,7 +74,7 @@ export function RevenueChart({ rows = [], onViewOrders }) {
 								<stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0.0} />
 							</linearGradient>
 						</defs>
-						<CartesianGrid horizontal={true} vertical={false} strokeDasharray="3 3" stroke="rgba(244,236,221,0.06)" />
+						<CartesianGrid horizontal={true} vertical={false} strokeDasharray="3 3" stroke="rgba(107,107,107,0.15)" />
 						<XAxis
                             axisLine={false}
                             dataKey="date"
@@ -88,7 +88,7 @@ export function RevenueChart({ rows = [], onViewOrders }) {
                             cursor={{ stroke: 'var(--chart-1)', strokeWidth: 1, strokeDasharray: '4 4' }}
                             content={
 								<ChartTooltipContent
-                                    className="min-w-36 border-[rgba(245,196,0,0.2)] bg-[rgba(21,15,11,0.85)] backdrop-blur-md"
+                                    className="min-w-36 border-[rgba(244,177,40,0.35)] bg-[rgba(255,255,255,0.97)] backdrop-blur-md"
                                     indicator="line"
                                     labelFormatter={(_, payload) => payload?.[0]?.payload?.fullDate || ""}
                                 />
@@ -106,7 +106,7 @@ export function RevenueChart({ rows = [], onViewOrders }) {
 					</AreaChart>
 				</ChartContainer>
 			</CardContent>
-            <CardFooter className="flex items-center justify-between border-t border-[rgba(255,255,255,0.03)] pt-4 mt-2">
+            <CardFooter className="flex items-center justify-between border-t border-[#F4E6C0] pt-4 mt-2">
 				<div className="flex items-center gap-1 text-muted-foreground text-xs">
 					<Delta value={growthPct}>
 						<DeltaIcon />

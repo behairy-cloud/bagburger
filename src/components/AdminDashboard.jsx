@@ -9,6 +9,7 @@ import {
   UtensilsCrossed,
   ClipboardList,
   Search,
+  Users,
 } from 'lucide-react';
 import {
   ORDER_STATUSES,
@@ -18,6 +19,7 @@ import {
   CATEGORIES,
   WHATSAPP_NUMBER_DISPLAY,
 } from '../js/products';
+import { supabase } from '../js/supabase';
 import { adminSignIn, adminSignOut, getAdminSession, supabaseAuth } from '../js/supabase-auth';
 import { syncSupabaseAuthSession } from '../js/supabase';
 import { storage } from '../js/storage';
@@ -25,6 +27,7 @@ import { premiumEase, premiumSpring } from '../js/motion';
 import { Dashboard } from './dashboard';
 import { DashboardSkeleton } from './dashboard-skeleton';
 import MenuManager from './MenuManager';
+import StaffManager from './StaffManager';
 import { LogoIcon } from './logo';
 
 const statusOptions = ['الكل', ...ORDER_STATUSES];
@@ -33,6 +36,7 @@ const statusOptions = ['الكل', ...ORDER_STATUSES];
 const TABS = [
   { id: 'dashboard', label: 'لوحة التحكم', icon: LayoutDashboard },
   { id: 'menu',      label: 'إدارة المنيو', icon: UtensilsCrossed },
+  { id: 'staff',     label: 'فريق العمل',  icon: Users },
   { id: 'orders',    label: 'الطلبات',      icon: ClipboardList },
 ];
 
@@ -153,10 +157,12 @@ export default function AdminDashboard({ onBack, onMenuChange }) {
   // reads/writes on.
   useEffect(() => {
     const { data: subscription } = supabaseAuth.auth.onAuthStateChange((_event, session) => {
-      syncSupabaseAuthSession(session);
+      syncSupabaseAuthSession(session).then(() => {
+        if (session) loadOrders();
+      });
     });
     return () => subscription.subscription.unsubscribe();
-  }, []);
+  }, [loadOrders]);
 
   useEffect(() => { if (authed) loadOrders(); }, [authed, loadOrders]);
 
@@ -169,6 +175,16 @@ export default function AdminDashboard({ onBack, onMenuChange }) {
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
   }, [loadOrders]);
+
+  useEffect(() => {
+    if (!authed || !supabase) return;
+    const channel = supabase.channel('admin-orders-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+        loadOrders();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [authed, loadOrders]);
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -408,9 +424,9 @@ export default function AdminDashboard({ onBack, onMenuChange }) {
           transition={prefersReduced ? { duration: 0 } : { duration: 0.34, ease: premiumEase }}
         >
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-            <LogoIcon width={40} height={40} style={{ borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,.5)' }} />
+            <LogoIcon width={40} height={40} style={{ borderRadius: 10, boxShadow: '0 4px 16px rgba(60,42,0,.18)' }} />
             <div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, letterSpacing: 2, color: 'var(--fire-bright)', lineHeight: 1 }}>SIDE BURGER</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, letterSpacing: 2, color: 'var(--fire-dim)', lineHeight: 1 }}>BAG BURGER</div>
               <div style={{ fontSize: 11, color: 'var(--text-dimmer)', letterSpacing: 1 }}>ADMIN PANEL</div>
             </div>
           </div>
@@ -473,7 +489,7 @@ export default function AdminDashboard({ onBack, onMenuChange }) {
       <header className="admin-header">
         <div className="wrap admin-header-inner">
           <div className="header-meta">
-            <h2>SIDE BURGER — لوحة الإدارة</h2>
+            <h2>BAG BURGER — لوحة الإدارة</h2>
             <div className="admin-stats">
               <span>إجمالي الطلبات: {counts.total}</span>
               <span className="dot-divider" />
@@ -554,6 +570,20 @@ export default function AdminDashboard({ onBack, onMenuChange }) {
               transition={{ duration: prefersReduced ? 0 : 0.26, ease: premiumEase }}
             >
               <MenuManager onChange={onMenuChange} />
+            </motion.div>
+          )}
+
+          {/* ════ STAFF TAB ════ */}
+          {activeTab === 'staff' && (
+            <motion.div
+              key="tab-staff"
+              className="admin-tab-panel"
+              initial={prefersReduced ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={prefersReduced ? {} : { opacity: 0, y: -6 }}
+              transition={{ duration: prefersReduced ? 0 : 0.26, ease: premiumEase }}
+            >
+              <StaffManager />
             </motion.div>
           )}
 
@@ -645,7 +675,7 @@ export default function AdminDashboard({ onBack, onMenuChange }) {
                   <motion.div id="orders-panel" className="admin-orders-grid" layout={!prefersReduced}>
                     <AnimatePresence mode="popLayout" initial={false}>
                       {visibleOrders.map((order, index) => {
-                        const statusColor = STATUS_COLORS[order.status] || { bg: 'rgba(255,255,255,0.08)', fg: '#fff' };
+                        const statusColor = STATUS_COLORS[order.status] || { bg: 'rgba(32,32,32,0.08)', fg: 'var(--text-dim)' };
                         const formattedDate = new Date(order.createdAt || Date.now()).toLocaleString('ar-EG', {
                           dateStyle: 'medium',
                           timeStyle: 'short',

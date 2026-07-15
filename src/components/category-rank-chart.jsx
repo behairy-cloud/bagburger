@@ -63,10 +63,10 @@ export function CategoryRankChart({ rows = [] }) {
 	const data = React.useMemo(() => buildSlices(consolidateTopFourAndOthers(rows)), [rows]);
 
 	return (
-        <Card className="md:col-span-1 lg:col-span-2 border-[rgba(244,236,221,0.06)] bg-[rgba(255,255,255,0.015)] shadow-[0_14px_34px_-16px_rgba(0,0,0,0.6)]">
+        <Card className="md:col-span-1 lg:col-span-2 border-[#F4E6C0] shadow-[0_14px_34px_-16px_rgba(60,42,0,0.14)]">
             <CardHeader className="pb-2">
-				<CardTitle className="text-cream font-display text-lg">توزيع الطلبات حسب القسم</CardTitle>
-				<CardDescription className="text-cream-dimmer">نسبة العناصر المطلوبة في كل قسم</CardDescription>
+				<CardTitle className="text-foreground font-display text-lg">توزيع الطلبات حسب القسم</CardTitle>
+				<CardDescription className="text-muted-foreground">نسبة العناصر المطلوبة في كل قسم</CardDescription>
 			</CardHeader>
             <CardContent className="my-auto p-0 pb-4">
 				<ChartContainer className="aspect-auto h-72 w-full" config={data.chartConfig}>
@@ -78,13 +78,13 @@ export function CategoryRankChart({ rows = [] }) {
                             innerRadius={55}
                             nameKey="key"
                             outerRadius="82%"
-                            stroke="rgba(21,15,11,0.8)"
+                            stroke="#fff"
                             strokeWidth={3}
                             paddingAngle={3}
                             className="transition-all duration-300 hover:opacity-90 cursor-pointer"
                         >
 							<LabelList
-                                className="fill-[#1c1005] font-bold text-sm"
+                                className="fill-[#202020] font-bold text-sm"
                                 dataKey="share"
                                 fill="currentColor"
                                 fontWeight={700}
@@ -96,13 +96,13 @@ export function CategoryRankChart({ rows = [] }) {
 						<ChartTooltip 
                             content={
                                 <ChartTooltipContent 
-                                    className="min-w-36 border-[rgba(217,164,65,0.2)] bg-[rgba(21,15,11,0.85)] backdrop-blur-md"
+                                    className="min-w-36 border-[rgba(244,177,40,0.35)] bg-[rgba(255,255,255,0.97)] backdrop-blur-md"
                                     nameKey="key" 
                                     hideLabel 
                                 />
                             } 
                         />
-						<ChartLegend content={<ChartLegendContent className="flex flex-wrap gap-3 pt-4 text-cream-dimmer" nameKey="key" />} />
+						<ChartLegend content={<ChartLegendContent className="flex flex-wrap gap-3 pt-4 text-muted-foreground" nameKey="key" />} />
 					</PieChart>
 				</ChartContainer>
 			</CardContent>

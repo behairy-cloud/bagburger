@@ -67,19 +67,19 @@ export function DashboardStats({ summary }) {
 function StatCard({ stat }) {
 	const { label, value, delta, hint } = stat;
 	return (
-        <Card className="relative overflow-hidden group border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.015)] shadow-[0_10px_24px_-12px_rgba(0,0,0,0.5)] transition-all duration-300 hover:shadow-[0_14px_34px_-12px_rgba(0,0,0,0.7)] hover:border-[rgba(245,196,0,0.25)] hover:-translate-y-0.5">
-            <div className="absolute inset-0 bg-gradient-to-br from-[rgba(245,196,0,0.04)] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none" />
+        <Card className="relative overflow-hidden group border-[#F4E6C0] shadow-[0_10px_24px_-12px_rgba(60,42,0,0.1)] transition-all duration-300 hover:shadow-[0_14px_34px_-12px_rgba(60,42,0,0.2)] hover:border-[rgba(244,177,40,0.4)] hover:-translate-y-0.5">
+            <div className="absolute inset-0 bg-gradient-to-br from-[rgba(244,177,40,0.08)] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none" />
             <CardHeader className="pb-2">
 				<CardTitle className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
 					{label}
 				</CardTitle>
 			</CardHeader>
             <CardContent>
-				<p className="text-balance font-bold text-3xl tabular-nums tracking-tight text-foreground drop-shadow-[0_2px_10px_rgba(255,255,255,0.1)]">
+				<p className="text-balance font-bold text-3xl tabular-nums tracking-tight text-foreground">
 					{value}
 				</p>
 			</CardContent>
-            <CardFooter className="gap-2 text-xs pt-1 border-t border-[rgba(255,255,255,0.03)] mt-2">
+            <CardFooter className="gap-2 text-xs pt-1 border-t border-[#F4E6C0] mt-2">
 				<Delta value={delta}>
 					<DeltaIcon />
 					<DeltaValue />

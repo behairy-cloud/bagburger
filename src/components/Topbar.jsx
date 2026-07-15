@@ -11,7 +11,7 @@ export default function Topbar({ cartCount, cartBounce, onCartClick }) {
     <header className="topbar">
       <div className="wrap topbar-inner">
         {/* Brand Logo */}
-        <a href="#top" className="brand-mini" aria-label="SIDE BURGER - العودة للأعلى">
+        <a href="#top" className="brand-mini" aria-label="BAG BURGER - العودة للأعلى">
           <motion.div
             className="brand-mini-logo"
             whileHover={prefersReduced ? {} : { scale: 1.06, rotate: -2 }}
@@ -21,7 +21,7 @@ export default function Topbar({ cartCount, cartBounce, onCartClick }) {
             <LogoIcon width={40} height={40} aria-hidden="true" />
           </motion.div>
           <div className="brand-mini-text">
-            <span className="brand-mini-name">SIDE</span>
+            <span className="brand-mini-name">BAG</span>
             <span className="brand-mini-sub">BURGER</span>
           </div>
         </a>

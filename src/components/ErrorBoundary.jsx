@@ -17,7 +17,7 @@ export default class ErrorBoundary extends Component {
         <div style={{
           minHeight: '100vh', display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center', gap: 16,
-          background: '#231F20', color: '#F4ECDD', textAlign: 'center', padding: 24,
+          background: '#FFFDF8', color: '#202020', textAlign: 'center', padding: 24,
         }}>
           <p style={{ fontSize: 18 }}>حدث خطأ غير متوقع. برجاء إعادة تحميل الصفحة.</p>
           <button
@@ -25,7 +25,7 @@ export default class ErrorBoundary extends Component {
             onClick={() => window.location.reload()}
             style={{
               padding: '10px 24px', borderRadius: 8, border: 'none',
-              background: '#F5C400', color: '#231F20', fontWeight: 700, cursor: 'pointer',
+              background: '#F4B128', color: '#202020', fontWeight: 700, cursor: 'pointer',
             }}
           >
             إعادة التحميل

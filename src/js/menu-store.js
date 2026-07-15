@@ -52,7 +52,7 @@ const fromRow = (row, index = 0) => ({
 
 export async function loadMenuItems({ seedIfEmpty = true } = {}) {
   if (!supabaseEnabled || !supabase) {
-    return DEFAULT_MENU_ITEMS;
+    return [];
   }
 
   const { data, error } = await supabase
@@ -62,12 +62,20 @@ export async function loadMenuItems({ seedIfEmpty = true } = {}) {
     .order('created_at', { ascending: true });
 
   if (error) {
-    return DEFAULT_MENU_ITEMS;
+    return [];
   }
 
   if ((!data || data.length === 0) && seedIfEmpty) {
     await seedMenuItems(DEFAULT_MENU_ITEMS);
-    return DEFAULT_MENU_ITEMS;
+    const { data: seeded, error: seedErr } = await supabase
+      .from(MENU_TABLE)
+      .select('*')
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true });
+    if (!seedErr && seeded?.length) {
+      return seeded.map(fromRow);
+    }
+    return [];
   }
 
   return (data || []).map(fromRow);

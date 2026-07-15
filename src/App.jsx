@@ -2,13 +2,15 @@ import { useState, useEffect, useCallback, useMemo, Suspense, lazy } from 'react
 import { AnimatePresence, MotionConfig, motion, useReducedMotion } from 'framer-motion';
 import { CATEGORIES, PRODUCTS, WHATSAPP_NUMBER_INTL, fmt, productById } from './js/products';
 import { storage } from './js/storage';
-import { DEFAULT_MENU_ITEMS, loadMenuItems } from './js/menu-store';
+import { loadMenuItems } from './js/menu-store';
 import { setMenuProducts } from './js/products';
 import Topbar from './components/Topbar';
 import Hero from './components/Hero';
 import CategoryNav from './components/CategoryNav';
 import MenuSection from './components/MenuSection';
 import CartDrawer from './components/CartDrawer';
+import StaffSection from './components/StaffSection';
+import MenuSkeleton from './components/MenuSkeleton';
 import { LogoWordmark } from './components/logo';
 
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
@@ -20,7 +22,7 @@ export default function App() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [activeCategory, setActiveCategory] = useState(CATEGORIES[0].key);
   const [cartBounce, setCartBounce] = useState(0);
-  const [menuItems, setMenuItems] = useState(DEFAULT_MENU_ITEMS);
+  const [menuItems, setMenuItems] = useState(null);
   const [menuLoading, setMenuLoading] = useState(true);
   const [scrolledPastHero, setScrolledPastHero] = useState(false);
   const prefersReduced = useReducedMotion();
@@ -105,7 +107,7 @@ export default function App() {
   const cartTotal = useMemo(() => cartEntries.reduce((s, it) => s + it.price * it.qty, 0), [cartEntries]);
   const cartCount = useMemo(() => cartEntries.reduce((s, it) => s + it.qty, 0), [cartEntries]);
   const visibleMenuItems = useMemo(
-    () => menuItems.filter((item) => item.isVisible !== false),
+    () => (menuItems || []).filter((item) => item.isVisible !== false),
     [menuItems]
   );
 
@@ -135,19 +137,23 @@ export default function App() {
 
         <main>
           <div className="wrap" id="menuRoot">
-            {CATEGORIES.map((cat, catIndex) => (
-              <MenuSection
-                key={cat.key}
-                category={cat}
-                products={visibleMenuItems.filter((p) => p.cat === cat.key)}
-                cart={cart}
-                onAdd={addToCart}
-                onIncrement={incrementItem}
-                onDecrement={decrementItem}
-                onBecomeVisible={() => setActiveCategory(cat.key)}
-                catIndex={catIndex}
-              />
-            ))}
+            {menuLoading ? (
+              <MenuSkeleton />
+            ) : (
+              CATEGORIES.map((cat, catIndex) => (
+                <MenuSection
+                  key={cat.key}
+                  category={cat}
+                  products={visibleMenuItems.filter((p) => p.cat === cat.key)}
+                  cart={cart}
+                  onAdd={addToCart}
+                  onIncrement={incrementItem}
+                  onDecrement={decrementItem}
+                  onBecomeVisible={() => setActiveCategory(cat.key)}
+                  catIndex={catIndex}
+                />
+              ))
+            )}
           </div>
         </main>
 
@@ -157,13 +163,16 @@ export default function App() {
             <span className="story-kicker">قصتنا</span>
             <h2 className="story-title">شغف بالطعم، من أول قضمة</h2>
             <p className="story-text">
-              SIDE BURGER بدأت من فكرة بسيطة: برجر بمكونات مختارة بعناية، يتحضّر طازة
+              BAG BURGER بدأت من فكرة بسيطة: برجر بمكونات مختارة بعناية، يتحضّر طازة
               لحظة ما تطلبه، من غير أي مجاملة في الجودة. كل صنف في المنيو بيتعمل بنفس
               الاهتمام — من اللحمة للصوصات لطريقة التقديم — عشان توصلك تجربة تستاهل
               اسمنا.
             </p>
           </div>
         </section>
+
+        {/* Team */}
+        <StaffSection />
 
         {/* Sticky cart bar */}
         <AnimatePresence>
@@ -235,14 +244,14 @@ export default function App() {
             {/* Contact */}
             <div className="footer-col" id="contact">
               <h3 className="footer-col-title">تواصل معنا</h3>
-              <a href={`https://wa.me/${WHATSAPP_NUMBER_INTL}`} target="_blank" rel="noopener" className="footer-link">
-                📱 واتساب — 0602 880 54 966+
+              <a href={`https://wa.me/${WHATSAPP_NUMBER_INTL}`} target="_blank" rel="noopener noreferrer" className="footer-link">
+                📱 واتساب — 9039 055 57 966+
               </a>
-              <a href="https://instagram.com/side_burger" target="_blank" rel="noopener" className="footer-link">
-                📸 انستقرام — side_burger
+              <a href="https://www.instagram.com/bagburgerksa" target="_blank" rel="noopener noreferrer" className="footer-link">
+                📸 انستقرام — bagburgerksa
               </a>
-              <a href="https://tiktok.com/@side.burger" target="_blank" rel="noopener" className="footer-link">
-                🎵 تيك توك — side.burger
+              <a href="https://tiktok.com/@bagburgerksa" target="_blank" rel="noopener noreferrer" className="footer-link">
+                🎵 تيك توك — bagburgerksa
               </a>
             </div>
 
@@ -250,12 +259,12 @@ export default function App() {
             <div className="footer-col" id="locations">
               <h3 className="footer-col-title">موقعنا</h3>
               <a
-                href="https://maps.google.com/?q=H5F7%2BMP+Ar+Rawdah,+Jeddah+Saudi+Arabia"
+                href="https://maps.google.com/?q=PQWG%2BCC+Al+Andalus,+Riyadh+Saudi+Arabia"
                 target="_blank"
                 rel="noopener"
                 className="footer-link"
               >
-                📍 الروضة، جدة — H5F7+MP
+                📍 الأندلس، الرياض — PQWG+CC
               </a>
             </div>
           </div>
@@ -263,7 +272,7 @@ export default function App() {
           {/* Bottom bar */}
           <div className="footer-bottom">
             <div className="wrap footer-bottom-inner">
-              <span>© {new Date().getFullYear()} SIDE BURGER — جميع الحقوق محفوظة</span>
+              <span>© {new Date().getFullYear()} BAG BURGER — جميع الحقوق محفوظة</span>
               <span className="footer-fire">🔥 Made with passion</span>
             </div>
           </div>

@@ -4,7 +4,7 @@
 -- found *no* matching INSERT policy at all for storage.objects (a missing
 -- base privilege gives a different "permission denied" error).
 --
--- The likely cause: in 20260621_tatbela_orders.sql, the storage policies
+-- The likely cause: in 20260621_bagburger_orders.sql, the storage policies
 -- for the order-screenshots bucket are preceded by
 --   revoke all on storage.objects from public;
 --   revoke all on storage.objects from authenticated;

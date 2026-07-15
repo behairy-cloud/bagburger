@@ -1,13 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl =
-  import.meta.env.VITE_SUPABASE_URL?.trim() ||
-  'https://tzfpkzxvolnclhvojjwg.supabase.co';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim() || '';
 
-const supabaseKey =
-  import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() ||
-  import.meta.env.VITE_SUPABASE_KEY?.trim() ||
-  '';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() || '';
 
 export const supabaseEnabled = Boolean(supabaseUrl && supabaseKey);
 
@@ -24,6 +19,7 @@ export const supabase = supabaseEnabled
 export const ORDERS_TABLE       = 'orders';
 export const ORDER_BUCKET       = 'order-screenshots';
 export const MENU_IMAGE_BUCKET  = 'menu-item-images';
+export const STAFF_IMAGE_BUCKET = 'staff-images';
 
 /**
  * All admin-only RLS policies (orders, menu writes) require the `authenticated`

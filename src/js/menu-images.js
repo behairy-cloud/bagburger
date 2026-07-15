@@ -1,8 +1,6 @@
-// SIDE BURGER — menu image URL resolution
+// BAG BURGER — menu image URL resolution
 
-const SUPABASE_URL =
-  import.meta.env.VITE_SUPABASE_URL?.trim?.() ||
-  'https://tzfpkzxvolnclhvojjwg.supabase.co';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL?.trim?.() || '';
 
 export function getMenuImageUrl(storedPath) {
   if (!storedPath) return null;

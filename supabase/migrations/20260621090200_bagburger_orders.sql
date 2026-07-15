@@ -1,4 +1,4 @@
--- Tatbela orders schema + security hardening
+-- Bag Burger orders schema + security hardening
 -- Apply this in Supabase after creating the project.
 
 create extension if not exists pgcrypto;
