@@ -439,9 +439,9 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (max-width: 768px) {
-  .hero-nav { flex-wrap: wrap; gap: 16px; }
+  .hero-nav { padding: 20px 24px 0; gap: 12px; }
   .hero-links { display: none; }
-  .hero-content { padding: 32px 20px 100px; }
+  .hero-content { padding: 28px 20px 80px; }
 }
 
 /* ── CATEGORY NAV ────────────────────────────────────────────────── */
@@ -701,6 +701,14 @@ main { padding: 48px 0 100px; }
 
 @media (max-width: 400px) {
   .menu-card-media { aspect-ratio: 3/2; }
+}
+
+@media (max-width: 360px) {
+  .menu-card-media { aspect-ratio: 16/9; }
+  .menu-card-info { padding: 18px 10px 10px; }
+  .menu-card-info-bottom { min-height: 30px; }
+  .stepper-btn { width: 24px; height: 24px; }
+  .stepper-count { min-width: 20px; font-size: 12px; }
 }
 
 /* Stepper */
@@ -1046,11 +1054,11 @@ input[type="checkbox"] {
 
 /* ── RESPONSIVE ─────────────────────────────────────────────────── */
 @media (max-width: 700px) {
-  main { padding: 32px 0 80px; }
-  .cat-section { padding: 28px 0 4px; scroll-margin-top: 120px; }
-  .cat-head { flex-direction: column; align-items: flex-start; }
-  .cat-head h2 { font-size: 28px; }
-  .cat-head h2 .cat-emoji { font-size: 24px; }
+  main { padding: 16px 0 80px; }
+  .cat-section { padding: 16px 0 4px; scroll-margin-top: 112px; }
+  .cat-head { flex-direction: column; align-items: flex-start; margin-bottom: 16px; }
+  .cat-head h2 { font-size: 24px; }
+  .cat-head h2 .cat-emoji { font-size: 20px; }
   .cat-head-line { display: none; }
 
   .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
@@ -1066,23 +1074,45 @@ input[type="checkbox"] {
 }
 
 @media (max-width: 520px) {
-  .hero { min-height: auto; }
-  .hero-content { padding: 24px 16px 80px; gap: 24px; }
-  .hero-right img { max-height: 260px; }
-  .hero-title { font-size: 32px; }
-  .hero-tagline { font-size: 15px; margin: 14px 0 24px; }
-  .hero-btn { padding: 14px 22px; font-size: 13px; }
-  .hero-features { gap: 16px; }
-  .hero-feature-item { gap: 8px; }
-  .hero-feature-icon { width: 36px; height: 36px; }
-  .hero-feature-icon svg { width: 16px; height: 16px; }
-  .hero-feature-item span { font-size: 11px; }
+  .hero { min-height: auto; padding: 0; }
+  .hero-nav { padding: 14px 16px 0; }
+  .hero-content { padding: 20px 14px 40px; gap: 16px; }
+  .hero-right img { max-height: 200px; }
+  .hero-title { font-size: 28px; }
+  .hero-tagline { font-size: 14px; margin: 10px 0 18px; max-width: 100%; }
+  .hero-btn { padding: 12px 18px; font-size: 12px; }
+  .hero-ctas { gap: 8px; margin-bottom: 20px; }
+  .hero-badge { font-size: 10px; padding: 5px 12px; margin-bottom: 12px; }
+  .hero-features { gap: 12px; }
+  .hero-feature-item { gap: 6px; }
+  .hero-feature-icon { width: 30px; height: 30px; border-radius: 10px; }
+  .hero-feature-icon svg { width: 14px; height: 14px; }
+  .hero-feature-item span { font-size: 10px; }
   .hero-scroll { display: none !important; }
-  .hero-badge { font-size: 11px; padding: 6px 14px; margin-bottom: 16px; }
-  .hero-ctas { gap: 10px; margin-bottom: 28px; }
 
-  .sticky-cart-inner { padding: 10px 10px 10px 14px; gap: 10px; }
-  .sticky-cart-inner button { padding: 9px 16px; font-size: 13px; }
+  .sticky-cart-inner { padding: 8px 8px 8px 12px; gap: 8px; }
+  .sticky-cart-inner button { padding: 8px 14px; font-size: 12px; }
+}
+
+@media (max-width: 520px) {
+  .cat-nav-wrap { top: 0; }
+  .cat-nav { padding: 8px 12px; }
+  .cat-pill { padding: 6px 12px; font-size: 12px; }
+}
+
+@media (max-width: 400px) {
+  .hero-content { padding: 14px 10px 24px; gap: 10px; }
+  .hero-right img { max-height: 140px; }
+  .hero-title { font-size: 22px; }
+  .hero-tagline { font-size: 12px; margin: 6px 0 12px; }
+  .hero-btn { padding: 9px 12px; font-size: 11px; }
+  .hero-ctas { gap: 6px; margin-bottom: 12px; }
+  .hero-feature-icon { width: 26px; height: 26px; border-radius: 8px; }
+  .hero-feature-icon svg { width: 12px; height: 12px; }
+  .hero-feature-item span { font-size: 9px; }
+  .cat-nav-wrap { top: 0; }
+  .cat-nav { padding: 6px 10px; }
+  .cat-pill { padding: 5px 10px; font-size: 11px; }
 }
 
 /* ── SCROLLBAR ───────────────────────────────────────────────────── */

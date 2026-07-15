@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Plus, Minus, Flame, Star, Sparkles, ImageOff } from 'lucide-react';
 import { fmt } from '../js/products';
@@ -14,6 +15,7 @@ const LABEL_CONFIG = {
 export default function ProductCard({ product, qty = 0, onAdd, onIncrement, onDecrement }) {
   const prefersReduced = useReducedMotion();
   const imageSrc = resolveMenuImageSource(product.imagePath);
+  const [imgFailed, setImgFailed] = useState(false);
   const labels = product.labels || [];
   const priceParts = fmt(product.price).split(' ');
 
@@ -35,8 +37,8 @@ export default function ProductCard({ product, qty = 0, onAdd, onIncrement, onDe
     >
       {/* Product image / visual */}
       <div className="menu-card-media" aria-hidden="true">
-        {imageSrc ? (
-          <img src={imageSrc} alt="" loading="lazy" decoding="async" />
+        {imageSrc && !imgFailed ? (
+          <img src={imageSrc} alt="" loading="lazy" decoding="async" onError={() => setImgFailed(true)} />
         ) : (
           <div className="menu-card-media-empty">
             <ImageOff size={26} />
