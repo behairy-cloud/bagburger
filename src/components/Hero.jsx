@@ -119,7 +119,10 @@ export default function Hero() {
           animate={{ opacity: 1, scale: 1 }}
           transition={prefersReduced ? { duration: 0 } : { duration: 0.7, ease: premiumEase, delay: 0.1 }}
         >
-          <img src="/hero.png" alt="Bag Burger — signature burger" loading="eager" fetchpriority="high" />
+          <picture>
+            <source srcSet="/hero.webp" type="image/webp" />
+            <img src="/hero.png" alt="Bag Burger — signature burger" loading="eager" fetchpriority="high" />
+          </picture>
         </motion.div>
       </div>
 
